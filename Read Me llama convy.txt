@@ -1,0 +1,112 @@
+bangla_qwen_llamacpp/
+│
+├── llama.cpp/                ← llama.cpp repo
+├── models/                   ← Qwen GGUF model goes here
+│   └── Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
+|   └── 
+├── data/
+│   └── dat_llm_io.jsonl              ← Downloaded HF dataset
+├── scripts/
+│   └── main_llama3_8b_final_ex.py    ← Runs prediction
+├── utils.py                  ← Helper functions
+├── requirements.txt          ← Python dependencies
+└── evaluate_llm_strict.py               ←  Evaluation script
+
+============================================================
+Step 01: requirements.txt (inside)
+datasets
+numpy
+scikit-learn
+============================================================
+Run 01:
+
+CMAKE_ARGS="-DGGML_METAL=ON" pip install --force-reinstall --no-cache-dir "llama-cpp-python[metal]"
+
+%CMAKE_ARGS="-DGGML_METAL=ON" pip install --no-cache-dir --force-reinstall "llama-cpp-python"
+%llama-cpp-python==0.3.16
+
+pip install llama-cpp-python
+pip install -r requirements.txt
+
+============================================================
+Step 02: Download Qwen GGUF Model
+Use a GGUF-compatible model like:
+🔗 https://huggingface.co/TheBloke/Qwen1.5-1.8B-Chat-GGUF
+
+Download qwen1_5-1.8b-chat.Q4_K_M.gguf
+Put it in: models/
+
+============================================================
+Step 03: Download the Dataset from Hugging Face
+dev.json
+
+============================================================
+Step 04: Re-clone & Build with CMake
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+mkdir build
+cd build
+cmake -DLLAMA_METAL=on ..
+cmake --build . --config Release
+
+============================================================
+Step 05: Run this code into terminal
+
+python -m venv .venv
+source .venv/bin/activate  
+
+ 
+# Windows: .venv\Scripts\activate
+
+# 2) install
+pip install -r requirements.txt
+# (If you need GPU offload, reinstall llama-cpp-python with your backend enabled.)
+
+============================================================
+
+
+======= want to try only for top 50 data ?? use  this ======
+
+
+python scripts/main_llama3_8b_final_ex.py \
+  --prompt_variant qa_bn \
+  --model_path models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf \
+  --input data/data_llm_io.jsonl \
+  --out output/preds_llama31_8b_qa_bn_top50.jsonl \
+  --n_gpu_layers -1 \
+  --ctx 4096 \
+  --temperature 0.0 \
+  --max_tokens 256
+
+python evaluate_llm_strict.py \
+  --gold data/data_llm_io_top50.jsonl \
+  --pred output/preds_llama31_8b_qa_bn_top50.jsonl \
+  --out_csv results/metrics_llama31_8b_qa_bn_top50.csv
+
+python evaluate_details.py \
+  --gold data/data_llm_io.jsonl \
+  --pred output/preds_llama31_8b_qa_bn_top50.jsonl \
+  --out_csv results/metrics_llama31_8b_qa_bn_top50.csv
+
+
+===============. prompt pain EN ==========================
+
+python scripts/main_llama3_8b_final_ex.py \
+  --prompt_variant plain_en \
+  --model_path models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf \
+  --input data/data_llm_io_top50.jsonl \
+  --out output/preds_llama31_8b_plain_en.jsonl \
+  --n_gpu_layers -1 \
+  --ctx 4096 \
+  --temperature 0.0 \
+  --max_tokens 256
+
+
+python evaluate_details.py \
+  --gold data/data_llm_io_top50.jsonl \
+  --pred output/preds_llama31_8b_plain_en.jsonl \
+  --out_csv results/metrics_llama31_8b_qa_bn_top50.csv
+
+========================================
+
+other things will be same as it is 
