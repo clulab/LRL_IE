@@ -1,1 +1,487 @@
+import argparse
+import json
+import os
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+
+from tqdm import tqdm
+from llama_cpp import Llama
+
+SCHEMA_KEYS = ["Age", "Symptom", "Medicine", "Health_Condition", "Specialist", "Medical_Procedure"]
+
+
+# ======================
+# SYSTEM PROMPTS (variants)
+# ======================
+
+# Original English / mixed (your current one)
+SYSTEM_PROMPT_BASE_EN = (
+    "You are a question-answering assistant that performs medical Named Entity Recognition (NER).\n"
+    "For each question, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.\n"
+    "Your answer MUST be a single JSON object with EXACTLY these six keys (even if empty), in this order:\n"
+    "{\"Age\":[],\"Symptom\":[],\"Medicine\":[],\"Health_Condition\":[],\"Specialist\","
+    "\"Medical_Procedure\":[]}\n\n"
+    "Rules:\n"
+    "- Copy spans verbatim from the text (Bangla/English as they appear). No paraphrasing or hallucination.\n"
+    "- Duration vs Age: if a number modifies time words (\"গত/পিছনের/ধরে\" + দিন/সপ্তাহ/মাস, or "
+    "\"last/for/since\" + days/weeks/months), DO NOT label it as Age.\n"
+    "- Negation: if a symptom is negated within ~5 tokens (\"না/নাই/নেই/করিনি/হয়নি/হয়ে নাই/হয় নি\"), "
+    "DO NOT extract it.\n"
+    "- Lab/test terms alone (e.g., Triglyceride, কোলেস্টেরল, HbA1c) are NOT symptoms unless the text explicitly "
+    "states a complaint.\n"
+    "- Prefer concise head+modifier spans; exclude extra function words/punctuation. Do not output standalone "
+    "single letters (e.g., X/RT/S).\n"
+    "- Only label Age when it is an age expression (e.g., \"৪০ বছর\", \"years old\", \"Age 27\"), not bare numbers.\n"
+    "- Lists contain strings only; no duplicates; no commentary before or after the JSON.\n\n"
+    "Label hints (recall boosters without adding false positives):\n"
+    "- Symptom: Extract single-word symptoms (e.g., \"জ্বর\", \"কাশি\", \"বমি\") when a complaint verb appears nearby "
+    "(\"আছে/হচ্ছে/লাগছে/অনুভব/ভুগছি/সমস্যা\").\n"
+    "- Symptom: Also extract collocates exactly (\"মাথা ব্যথা\", \"গলা ব্যথা\", \"ঘন কফ\", \"বুকে ব্যথা\").\n"
+    "- Health_Condition: Keep disease/diagnosis nouns (\"ডায়াবেটিস\", \"উচ্চ রক্তচাপ\", \"অ্যাজমা\", "
+    "\"থাইরয়েড\", \"মাইগ্রেন\", \"গ্যাস্ট্রাইটিস\").\n"
+    "- Specialist: Titles/specialities (\"ডাক্তার\", \"চিকিৎসক\", \"বিশেষজ্ঞ\", \"ইএনটি বিশেষজ্ঞ\", "
+    "\"গ্যাস্ট্রোএন্টারোলজিস্ট\", \"নিউরোলজিস্ট\").\n"
+    "- Medical_Procedure: Extract tests/imaging when performed/ordered (\"করা হয়েছে/করাতে বলেছেন\", \"done/ordered\").\n\n"
+    "You will be asked the question:\n"
+    "\"Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\"\n\n"
+    "Examples:\n"
+)
+
+# Bangla-focused system prompt (shorter, but same behavior)
+SYSTEM_PROMPT_BASE_BN = (
+    "তুমি একটি প্রশ্ন-উত্তর ভিত্তিক সহকারী, যার কাজ মেডিকেল Named Entity Recognition (NER) করা।\n"
+    "প্রতিটি ইনপুট টেক্সটের জন্য কেবলমাত্র স্পষ্টভাবে থাকা entity গুলো বের করবে এবং সবসময় নিচের ফরম্যাটে JSON আউটপুট দেবে:\n"
+    "{\"Age\":[],\"Symptom\":[],\"Medicine\":[],\"Health_Condition\":[],\"Specialist\","
+    "\"Medical_Procedure\":[]}\n\n"
+    "রুলস:\n"
+    "- টেক্সটে যেভাবে লেখা আছে ঠিক সেভাবে span কপি করবে (বাংলা/ইংরেজি), কোনো paraphrase বা অতিরিক্ত কিছু নয়।\n"
+    "- সময় নির্দেশক সংখ্যা (যেমন 'দিন/সপ্তাহ/মাস ধরে', 'last/for/since + days/weeks/months') হলে Age হিসেবে নেবে না।\n"
+    "- যে লক্ষণগুলো স্পষ্টভাবে 'নেই/না/হয়নি/করিনি' এসব দিয়ে নেগেট করা হয়েছে, সেগুলো Symptom হিসেবে নেবে না।\n"
+    "- Lab test এর নাম একা থাকলে Symptom নয় (যেমন Triglyceride, কোলেস্টেরল, HbA1c)।\n"
+    "- Age হিসেবে শুধুই বয়সের অভিব্যক্তি নেবে (যেমন '৪০ বছর', 'years old', 'Age 27'), কেবল সংখ্যা হলে Age নয়।\n"
+    "- সব লিস্টে শুধু স্ট্রিং থাকবে; কোনো ডুপ্লিকেট থাকবে না; JSON এর আগে/পরে অন্য লেখা থাকবে না।\n\n"
+    "তোমাকে সবসময় এই প্রশ্নের উত্তর দিতে হবে:\n"
+    "\"এই টেক্সটে কোন কোন entity (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) আছে?\"\n\n"
+    "উদাহরণ:\n"
+)
+
+# Plain instruction-style English (non-question style, still JSON)
+SYSTEM_PROMPT_BASE_PLAIN_EN = (
+    "You are an assistant that performs Bangla medical Named Entity Recognition (NER).\n"
+    "For each input text, you must extract ONLY the entities that are explicitly present in the text and\n"
+    "return them in a fixed JSON schema.\n\n"
+    "Your answer MUST be a single JSON object with EXACTLY these six keys (in this order), and each value\n"
+    "MUST be a list of strings (possibly empty):\n"
+    "{\"Age\":[],\"Symptom\":[],\"Medicine\":[],\"Health_Condition\":[],\"Specialist\":[],\"Medical_Procedure\":[]}\n\n"
+    "Important global rules:\n"
+    "1) COPY SPANS VERBATIM\n"
+    "   - Copy text exactly as it appears in the input (Bangla/English). No translation, no paraphrasing,\n"
+    "     no summarizing, no guessing.\n"
+    "   - Do not invent entities that are not written in the text.\n\n"
+    "2) JSON ONLY\n"
+    "   - Output ONLY the JSON object. No explanation, no comments, no extra text before or after the JSON.\n"
+    "   - Do not add extra keys. Use only: Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure.\n\n"
+    "3) AGE vs DURATION\n"
+    "   - Age: expressions that describe a person's age, e.g. \"২৭ বছর\", \"৪০ বছর\", \"Age 55\", \"55 years old\".\n"
+    "   - Do NOT label duration as Age. If a number modifies time words such as\n"
+    "     \"দিন/সপ্তাহ/মাস/বছর ধরে\", or English phrases like \"for 3 days\", \"since 2 weeks\", \"last 5 months\",\n"
+    "     these are NOT Age.\n\n"
+    "4) SYMPTOM vs HEALTH_Condition (very important):\n"
+    "   - Symptom:\n"
+    "     * Short-term complaints or subjective experiences the patient feels.\n"
+    "     * Examples: \"জ্বর\", \"কাশি\", \"বমি\", \"মাথা ব্যথা\", \"বুকে ব্যথা\", \"শ্বাসকষ্ট\", \"অস্বস্তি\".\n"
+    "     * Often appears near verbs like \"আছে/হচ্ছে/লাগছে/ভুগছি/সমস্যা\".\n"
+    "   - Health_Condition:\n"
+    "     * Named diseases, diagnoses, or long-term medical conditions.\n"
+    "     * Examples: \"ডায়াবেটিস\", \"উচ্চ রক্তচাপ\", \"অ্যাজমা\", \"থাইরয়েড সমস্যা\", \"গ্যাস্ট্রাইটিস\",\n"
+    "       \"মাইগ্রেন\", \"হার্টের সমস্যা\".\n"
+    "   - If something is clearly a disease name or diagnosis, put it under Health_Condition, not Symptom.\n\n"
+    "5) MEDICINE\n"
+    "   - Names of drugs, tablets, syrups, injections, etc.\n"
+    "   - Examples: \"মেটফরমিন\", \"লোসারটান\", \"সেফিক্সিম\", specific brand names, etc.\n"
+    "   - Copy the exact span used in the text.\n\n"
+    "6) SPECIALIST\n"
+    "   - Medical specialties or doctor titles.\n"
+    "   - Examples: \"মেডিসিন বিশেষজ্ঞ\", \"ইএনটি বিশেষজ্ঞ\", \"গ্যাস্ট্রোএন্টারোলজিস্ট\", \"নিউরোলজিস্ট\",\n"
+    "     or generic doctor titles when clearly referring to a specialist.\n\n"
+    "7) MEDICAL_Procedure\n"
+    "   - Tests, imaging, procedures, operations.\n"
+    "   - Examples: \"ব্লাড টেস্ট\", \"এক্স-রে\", \"এমআরআই\", \"সিটি স্ক্যান\", \"টিম্পানোমেট্রি\",\n"
+    "     \"অপারেশন\", named surgeries.\n"
+    "   - Include them when they are done, planned, or recommended in the text.\n\n"
+    "8) NEGATION\n"
+    "   - If a symptom or condition is clearly negated within a few words (e.g., \"না/নেই/হয়নি/করিনি\"),\n"
+    "     do NOT extract that symptom.\n\n"
+    "9) EMPTY LISTS\n"
+    "   - If a category has no entities in the text, keep that list empty (e.g., \"Medicine\":[]).\n"
+    "   - Never drop a key. All six keys must always be present in the JSON.\n\n"
+    "You will be asked:\n"
+    "\"Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\"\n\n"
+    "Answer STRICTLY with a single JSON object following the schema above.\n\n"
+    "Examples:\n"
+)
+
+
+
+
+# ======================
+# Base few-shot examples (English wrappers, Bangla/English texts)
+# ======================
+
+BASE_FEWSHOTS: List[str] = [
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"গত সপ্তাহ থেকে জ্বর আছে, রাতে কাশি বাড়ে, মাঝে মাঝে বমি হয়.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[\"জ্বর\",\"কাশি\",\"বমি\"], \"Medicine\":[], "
+        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"বুকে ব্যথা হচ্ছে এবং শ্বাসকষ্ট আছে; খুব অস্বস্তি লাগছে.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[\"বুকে ব্যথা\",\"শ্বাসকষ্ট\",\"অস্বস্তি\"], \"Medicine\":[], "
+        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"রোগী অ্যাজমা ও গ্যাস্ট্রাইটিসের রোগী; গতকাল ধরা পড়েছে মাইগ্রেন.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
+        "\"Health_Condition\":[\"অ্যাজমা\",\"গ্যাস্ট্রাইটিস\",\"মাইগ্রেন\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"থাইরয়েড সমস্যা আছে; history of ডায়াবেটিস উল্লেখ আছে.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
+        "\"Health_Condition\":[\"থাইরয়েড সমস্যা\",\"ডায়াবেটিস\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"গত চার মাস ধরে মাথা ব্যথা; কাশি না.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[\"মাথা ব্যথা\"], \"Medicine\":[], "
+        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"Your serum Triglyceride is slightly raised; HbA1c 6.5%.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
+        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"গত তিন দিন ধরে কাশি ও জ্বর আছে। একজন মেডিসিন বিশেষজ্ঞ আমাকে সেফিক্সিম দিয়েছেন। এক্স-রে করা হয়নি.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[\"কাশি\",\"জ্বর\"], \"Medicine\":[\"সেফিক্সিম\"], "
+        "\"Health_Condition\":[], \"Specialist\":[\"মেডিসিন বিশেষজ্ঞ\"], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"রোগীর বয়স ৫৫ বছর। তিনি ডায়াবেটিস ও উচ্চ রক্তচাপের রোগী এবং মেটফরমিন ও লোসারটান খাচ্ছেন.\"\n"
+        "Answer: {\"Age\":[\"৫৫ বছর\"], \"Symptom\":[], \"Medicine\":[\"মেটফরমিন\",\"লোসারটান\"], "
+        "\"Health_Condition\":[\"ডায়াবেটিস\",\"উচ্চ রক্তচাপ\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+    ),
+    (
+        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+        "are present in this text?\n"
+        "Text: \"ইএনটি বিশেষজ্ঞ টিম্পানোমেট্রি করতে বলেছেন.\"\n"
+        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
+        "\"Health_Condition\":[], \"Specialist\":[\"ইএনটি বিশেষজ্ঞ\"], \"Medical_Procedure\":[\"টিম্পানোমেট্রি\"]}\n\n"
+    ),
+]
+
+
+# Base QA-style user template (English)
+USER_TEMPLATE_QA_EN = (
+    "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
+    "are present in this text?\n"
+    "Text:\n<<<\n{input_text}\n>>>\n"
+    "Answer (a single JSON object with those six keys):\n"
+)
+
+# Bangla-wrapped QA template
+USER_TEMPLATE_QA_BN = (
+    "প্রশ্ন: এই টেক্সটে কোন কোন entity (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) আছে?\n"
+    "টেক্সট:\n<<<\n{input_text}\n>>>\n"
+    "উত্তর (উপরের ছয়টি key সহ একটিমাত্র JSON অবজেক্ট):\n"
+)
+
+# Plain instruction style (no explicit "Question")
+USER_TEMPLATE_PLAIN_EN = (
+    "Text:\n<<<\n{input_text}\n>>>\n"
+    "Extract all entities for the schema:\n"
+    "Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure.\n"
+    "Return only a single JSON object with exactly these keys:\n"
+    "{\"Age\":[],\"Symptom\":[],\"Medicine\":[],\"Health_Condition\":[],\"Specialist\","
+    "\"Medical_Procedure\":[]}.\n"
+    "Answer:\n"
+)
+
+
+@dataclass
+class PromptConfig:
+    system_base: str
+    fewshots: List[str]
+    user_template: str
+
+
+def _make_bn_fewshots(base_fewshots: List[str]) -> List[str]:
+    """Convert 'Question/Text/Answer' labels in few-shots to Bangla wrappers."""
+    converted = []
+    for ex in base_fewshots:
+        ex_bn = (
+            ex.replace("Question:", "প্রশ্ন:")
+              .replace("Text:", "টেক্সট:")
+              .replace("Answer:", "উত্তর:")
+        )
+        converted.append(ex_bn)
+    return converted
+
+
+def get_prompt_config(variant: str) -> PromptConfig:
+    """
+    Return the prompt configuration for a given variant.
+
+    Supported variants:
+      - 'qa_en'   : QA-style, English wrappers (your original style)
+      - 'qa_bn'   : QA-style, Bangla wrappers
+      - 'plain_en': Instruction-style, English
+    """
+    if variant == "qa_en":
+        return PromptConfig(
+            system_base=SYSTEM_PROMPT_BASE_EN,
+            fewshots=BASE_FEWSHOTS,
+            user_template=USER_TEMPLATE_QA_EN,
+        )
+    elif variant == "qa_bn":
+        return PromptConfig(
+            system_base=SYSTEM_PROMPT_BASE_BN,
+            fewshots=_make_bn_fewshots(BASE_FEWSHOTS),
+            user_template=USER_TEMPLATE_QA_BN,
+        )
+    elif variant == "plain_en":
+        return PromptConfig(
+            system_base=SYSTEM_PROMPT_BASE_PLAIN_EN,
+            fewshots=BASE_FEWSHOTS,  # examples still fine; only wrapper style changes
+            user_template=USER_TEMPLATE_PLAIN_EN,
+        )
+    else:
+        # Fallback: default to qa_en
+        return PromptConfig(
+            system_base=SYSTEM_PROMPT_BASE_EN,
+            fewshots=BASE_FEWSHOTS,
+            user_template=USER_TEMPLATE_QA_EN,
+        )
+
+
+# ---------- JSON helpers ----------
+def extract_first_json(s: str) -> Optional[str]:
+    start = s.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    for i, ch in enumerate(s[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return s[start:i + 1]
+    return None
+
+
+def normalize_json_obj(obj: dict) -> dict:
+    fixed = {}
+    for k in SCHEMA_KEYS:
+        vals = obj.get(k, [])
+        if not isinstance(vals, list):
+            vals = []
+        norm = []
+        seen = set()
+        for v in vals:
+            if isinstance(v, str):
+                vv = " ".join(v.split()).strip()
+                if vv and vv not in seen:
+                    seen.add(vv)
+                    norm.append(vv)
+        fixed[k] = norm
+    return fixed
+
+
+def decode_to_json(text: str) -> dict:
+    js = extract_first_json(text)
+    if not js:
+        return {k: [] for k in SCHEMA_KEYS}
+    try:
+        obj = json.loads(js)
+    except Exception:
+        js2 = (js.replace("None", "null")
+               .replace("True", "true")
+               .replace("False", "false"))
+        try:
+            obj = json.loads(js2)
+        except Exception:
+            return {k: [] for k in SCHEMA_KEYS}
+    return normalize_json_obj(obj)
+
+
+def load_jsonl(path: str):
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        s = line.strip()
+        if s:
+            yield json.loads(s)
+
+
+def save_jsonl(path: str, rows):
+    with Path(path).open("w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
+# ---------- Token budgeting helpers ----------
+def count_tokens(llm: Llama, text: str) -> int:
+    return len(llm.tokenize(text.encode("utf-8"), add_bos=False))
+
+
+def fit_system_with_examples(
+    llm: Llama,
+    ctx: int,
+    max_gen_tokens: int,
+    cfg: PromptConfig,
+) -> str:
+    SAFETY = 64
+    budget = ctx - max_gen_tokens - SAFETY
+    base = cfg.system_base
+    tokens = count_tokens(llm, base)
+    pieces: List[str] = []
+    for ex in cfg.fewshots:
+        ex_tokens = count_tokens(llm, ex)
+        if tokens + ex_tokens > budget:
+            break
+        pieces.append(ex)
+        tokens += ex_tokens
+    return base + "".join(pieces)
+
+
+def maybe_truncate_input(
+    llm: Llama,
+    input_text: str,
+    ctx: int,
+    sys_str: str,
+    max_gen_tokens: int,
+    user_template: str,
+) -> Tuple[str, int, int]:
+    SAFETY = 64
+    budget = ctx - max_gen_tokens - SAFETY
+    user_block = user_template.format(input_text=input_text)
+    total = count_tokens(llm, sys_str) + count_tokens(llm, user_block)
+    if total <= budget:
+        return input_text, total, budget
+
+    toks_input = llm.tokenize(input_text.encode("utf-8"), add_bos=False)
+    # keep some tail tokens from input
+    keep = max(64, budget - count_tokens(llm, sys_str) - count_tokens(llm, user_template.format(input_text="")))
+    if keep < 64:
+        keep = 64
+    truncated_ids = toks_input[-keep:]
+    truncated_text = llm.detokenize(truncated_ids).decode("utf-8", errors="ignore")
+    user_block2 = user_template.format(input_text=truncated_text)
+    total2 = count_tokens(llm, sys_str) + count_tokens(llm, user_block2)
+    return truncated_text, total2, budget
+
+
+def build_messages(
+    llm: Llama,
+    input_text: str,
+    ctx: int,
+    max_gen_tokens: int,
+    cfg: PromptConfig,
+) -> List[Dict[str, str]]:
+    system_str = fit_system_with_examples(llm, ctx, max_gen_tokens, cfg)
+    input_text_fitted, _, _ = maybe_truncate_input(
+        llm,
+        input_text,
+        ctx,
+        system_str,
+        max_gen_tokens,
+        cfg.user_template,
+    )
+    return [
+        {"role": "system", "content": system_str},
+        {"role": "user", "content": cfg.user_template.format(input_text=input_text_fitted.strip())},
+    ]
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model_path", default="models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+                    help="Path to GGUF model file")
+    ap.add_argument("--input", default="data/data_llm_io.jsonl")
+    ap.add_argument("--out", default="data/preds_llama31_8b_ex_promptvar.jsonl")
+    ap.add_argument("--ctx", type=int, default=4096, help="Context window")
+    ap.add_argument("--n_gpu_layers", type=int, default=0,
+                    help="Set >0 (or -1) to offload layers to GPU if built with CUDA/Metal/OpenCL")
+    ap.add_argument("--n_threads", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("--max_tokens", type=int, default=256)
+    ap.add_argument("--temperature", type=float, default=0.1,
+                    help="Slight recall nudge; 0.0 for max determinism")
+    ap.add_argument("--top_p", type=float, default=0.9,
+                    help="Slight recall nudge; 1.0 for max determinism")
+    ap.add_argument("--seed", type=int, default=0)
+
+    ap.add_argument(
+        "--prompt_variant",
+        default="qa_en",
+        choices=["qa_en", "qa_bn", "plain_en"],
+        help=(
+            "Which prompt style to use:\n"
+            "  qa_en   = QA-style, English instructions (original style)\n"
+            "  qa_bn   = QA-style, Bangla instructions\n"
+            "  plain_en = Instruction-style, English (no explicit Question:)\n"
+        ),
+    )
+
+    args = ap.parse_args()
+
+    print(f"Loading GGUF: {args.model_path}")
+    print(f"Using prompt variant: {args.prompt_variant}")
+
+    cfg = get_prompt_config(args.prompt_variant)
+
+    llm = Llama(
+        model_path=args.model_path,
+        n_ctx=args.ctx,
+        n_gpu_layers=args.n_gpu_layers,
+        n_threads=args.n_threads,
+        seed=args.seed,
+        chat_format="llama-3",   # LLaMA-3 / 3.1 instruct
+        verbose=False,
+    )
+
+    records = list(load_jsonl(args.input))
+    out_rows = []
+
+    for r in tqdm(records, desc="Generating"):
+        messages = build_messages(llm, r["Input"], args.ctx, args.max_tokens, cfg)
+        out = llm.create_chat_completion(
+            messages=messages,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            max_tokens=args.max_tokens,
+        )
+        content = out["choices"][0]["message"]["content"]
+        pred = decode_to_json(content)
+        out_rows.append({"ID": r["ID"], "Input": r["Input"], "Pred": pred})
+
+    save_jsonl(args.out, out_rows)
+    print(f"Wrote {len(out_rows)} predictions -> {args.out}")
+
+
+if __name__ == "__main__":
+    main()
 
