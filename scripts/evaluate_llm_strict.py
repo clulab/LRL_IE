@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Dict, Set, List
 
-SCHEMA = ["Age","Symptom","Medicine","Health_Condition","Specialist","Medical_Procedure"]
+SCHEMA= ["Sign_or_Symptom", "Disease_or_Syndrome", "Pathologic_Function", "Finding", "Other_Clinical_Disorder", "Patient", "H-Professional", "Other_Role"]
 
 def load_jsonl(path: str) -> List[dict]:
     rows = []

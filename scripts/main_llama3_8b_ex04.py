@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple
 from tqdm import tqdm
 from llama_cpp import Llama
 
-SCHEMA_KEYS = ["Age","Symptom","Medicine","Health_Condition","Specialist","Medical_Procedure"]
+SCHEMA_KEYS = ["Sign_or_Symptom", "Disease_or_Syndrome", "Pathologic_Function", "Finding", "Other_Clinical_Disorder", "Patient", "H-Professional", "Other_Role"]
 
 # ======================
 # QA-style SYSTEM PROMPT (LLaMA)
@@ -16,23 +16,24 @@ SYSTEM_PROMPT_BASE = (
     "You are a question-answering assistant that performs medical Named Entity Recognition (NER).\n"
     "For each question, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.\n"
     "Your answer MUST be a single JSON object with EXACTLY these six keys (even if empty), in this order:\n"
-    "{\"Age\":[],\"Symptom\":[],\"Medicine\":[],\"Health_Condition\":[],\"Specialist\":[],\"Medical_Procedure\":[]}\n\n"
+    "{\"Sign_or_Symptom\":[],\"Disease_or_Syndrome\":[],\"Pathologic_Function\":[],\"Finding\":[],\"Other_Clinical_Disorder\":[],\"Patient\":[],\"H-Professional\":[],\"Other_Role\":[]}\n\n"
     "Rules:\n"
-    "- Copy spans verbatim from the text (Bangla/English as they appear). No paraphrasing or hallucination.\n"
-    "- Duration vs Age: if a number modifies time words (\"গত/পিছনের/ধরে\" + দিন/সপ্তাহ/মাস, or \"last/for/since\" + days/weeks/months), DO NOT label it as Age.\n"
-    "- Negation: if a symptom is negated within ~5 tokens (\"না/নাই/নেই/করিনি/হয়নি/হয়ে নাই/হয় নি\"), DO NOT extract it.\n"
-    "- Lab/test terms alone (e.g., Triglyceride, কোলেস্টেরল, HbA1c) are NOT symptoms unless the text explicitly states a complaint.\n"
-    "- Prefer concise head+modifier spans; exclude extra function words/punctuation. Do not output standalone single letters (e.g., X/RT/S).\n"
-    "- Only label Age when it is an age expression (e.g., \"৪০ বছর\", \"years old\", \"Age 27\"), not bare numbers.\n"
-    "- Lists contain strings only; no duplicates; no commentary before or after the JSON.\n\n"
+    "- Copy spans verbatim from the text (Basque/English as they appear). No paraphrasing or hallucination.\n"
+    "- Annotate the maximum extent of each entity. This means that all modifiers of a noun phrase should be included.\n"
+    "- Each occurrence of a disorder in the text should be considered independently.\n"
+    "- All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.\n"
+    "- Lists contain strings only; no commentary before or after the JSON.\n\n"
     "Label hints (recall boosters without adding false positives):\n"
-    "- Symptom: Extract single-word symptoms (e.g., \"জ্বর\", \"কাশি\", \"বমি\") when a complaint verb appears nearby (\"আছে/হচ্ছে/লাগছে/অনুভব/ভুগছি/সমস্যা\").\n"
-    "- Symptom: Also extract collocates exactly (\"মাথা ব্যথা\", \"গলা ব্যথা\", \"ঘন কফ\", \"বুকে ব্যথা\").\n"
-    "- Health_Condition: Keep disease/diagnosis nouns (\"ডায়াবেটিস\", \"উচ্চ রক্তচাপ\", \"অ্যাজমা\", \"থাইরয়েড\", \"মাইগ্রেন\", \"গ্যাস্ট্রাইটিস\").\n"
-    "- Specialist: Titles/specialities (\"ডাক্তার\", \"চিকিৎসক\", \"বিশেষজ্ঞ\", \"ইএনটি বিশেষজ্ঞ\", \"গ্যাস্ট্রোএন্টারোলজিস্ট\", \"নিউরোলজিস্ট\").\n"
-    "- Medical_Procedure: Extract tests/imaging when performed/ordered (\"করা হয়েছে/করাতে বলেছেন\", \"done/ordered\").\n\n"
+    "- Sign_or_Symptom is an observable manifestation of a disease or condition based on clinical judgment, or a manifestation of a disease or condition which is experienced by the patient and reported as a subjective observation.\n"
+    "- Disease_or_Syndrome is a condition which alters or interferes with a normal process, state, or activity of an organism. It is usually characterized by the abnormal functioning of one or more of the host's systems, parts, or organs.\n"
+    "- Pathologic_Function is a disordered process, activity, or state of the organism as a whole, of a body system or systems, or of multiple organs or tissues.\n"
+    "- Finding is that which is discovered by direct observation or measurement of an organism attribute or condition, including the clinical history of the patient.\n"
+    "- Other_Clinical_Disorder represents other disorders such as neoplastic process, injury or poisoning, mental or behavioral dysfunction, anatomical abnormality, acquired abnormality, and congenital abnormality.\n"
+    "- A Patient is the person to whom a clinical narrative refers and that is being treated by a health professional.\n"
+    "- A H-Professional is a professional that takes care of the patients and interact with them. These are normally doctors, nurses, emergency department paramedicals, etc.\n"
+    "- Other_Role represents the actors that are neither the patient or any health professional present in text. These can be animals, family and acquaintances of the patient, lawyers, generic mentions, etc.\n"
     "You will be asked the question:\n"
-    "\"Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\"\n\n"
+    "\"Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\"\n\n"
     "Examples:\n"
 )
 
@@ -41,59 +42,55 @@ SYSTEM_PROMPT_BASE = (
 # ======================
 FEWSHOTS: List[str] = [
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"গত সপ্তাহ থেকে জ্বর আছে, রাতে কাশি বাড়ে, মাঝে মাঝে বমি হয়.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[\"জ্বর\",\"কাশি\",\"বমি\"], \"Medicine\":[], "
-        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Bitan ingresatu behar izan dute, oka dela eta pairatu duen deshidratazioagatik.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [\"oka\"], \"Disease_or_Syndrome\": [\"deshidratazioagatik\"], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"বুকে ব্যথা হচ্ছে এবং শ্বাসকষ্ট আছে; খুব অস্বস্তি লাগছে.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[\"বুকে ব্যথা\",\"শ্বাসকষ্ট\",\"অস্বস্তি\"], \"Medicine\":[], "
-        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"PPRB (Giltzurrunaren alde bietako ukabil-perkusioa): minik ez.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [\"minik\"], \"Disease_or_Syndrome\": [], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"রোগী অ্যাজমা ও গ্যাস্ট্রাইটিসের রোগী; গতকাল ধরা পড়েছে মাইগ্রেন.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
-        "\"Health_Condition\":[\"অ্যাজমা\",\"গ্যাস্ট্রাইটিস\",\"মাইগ্রেন\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Aita oso zorrotza eta jeloskorra, ama bakegilea eta depresioarekin.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [\"depresioarekin\"], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": [\"Aita\", \"ama\"]}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"থাইরয়েড সমস্যা আছে; history of ডায়াবেটিস উল্লেখ আছে.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
-        "\"Health_Condition\":[\"থাইরয়েড সমস্যা\",\"ডায়াবেটিস\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Kirurgia orokorrean egindako analitikan ez zen infekzio daturik objektibatu, baina baibilirrubinaren eta Ca 19.9-ren igoera, minbizia susmoa handiagotuz.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [\"infekzio\"], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [\"minbizia\"], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"গত চার মাস ধরে মাথা ব্যথা; কাশি না.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[\"মাথা ব্যথা\"], \"Medicine\":[], "
-        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Gaixoa sindrome hemofagozitikoa zuen 71 urteko emakumezkoa zen.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [\"sindrome hemofagozitikoa\"], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [\"Gaixoa\", \"71 urteko emakumezkoa\"], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"Your serum Triglyceride is slightly raised; HbA1c 6.5%.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
-        "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Pazienteak duela bi aste edemak nabaritu zituen zangoetan.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [], \"Pathologic_Function\": [\"edemak\"], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [\"Pazienteak\"], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"গত তিন দিন ধরে কাশি ও জ্বর আছে। একজন মেডিসিন বিশেষজ্ঞ আমাকে সেফিক্সিম দিয়েছেন। এক্স-রে করা হয়নি.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[\"কাশি\",\"জ্বর\"], \"Medicine\":[\"সেফিক্সিম\"], "
-        "\"Health_Condition\":[], \"Specialist\":[\"মেডিসিন বিশেষজ্ঞ\"], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Martxoaren 3an, txertatutako gunean flebitisa duela ohartzen da erizaina.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [\"flebitisa\"], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [\"erizaina\"], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"রোগীর বয়স ৫৫ বছর। তিনি ডায়াবেটিস ও উচ্চ রক্তচাপের রোগী এবং মেটফরমিন ও লোসারটান খাচ্ছেন.\"\n"
-        "Answer: {\"Age\":[\"৫৫ বছর\"], \"Symptom\":[], \"Medicine\":[\"মেটফরমিন\",\"লোসারটান\"], "
-        "\"Health_Condition\":[\"ডায়াবেটিস\",\"উচ্চ রক্তচাপ\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Bihotzerrea sentitzen du maiz, edozein janari hartuta, eta goragalea ere bai.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [\"Bihotzerrea\", \"goragalea\"], \"Disease_or_Syndrome\": [], \"Pathologic_Function\": [], \"Finding\": [], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
-        "Text: \"ইএনটি বিশেষজ্ঞ টিম্পানোমেট্রি করতে বলেছেন.\"\n"
-        "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
-        "\"Health_Condition\":[], \"Specialist\":[\"ইএনটি বিশেষজ্ঞ\"], \"Medical_Procedure\":[\"টিম্পানোমেট্রি\"]}\n\n"
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Kirurgiak 4 ordu irauten ditu, azidosia, hipotermia eta koagulopatia agertuz.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [\"koagulopatia\"], \"Pathologic_Function\": [\"azidosia\"], \"Finding\": [\"hipotermia\"], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
     ),
+    (
+        "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
+        "Text: \"Ea krisi honi buruz hitz egiteko lagun edo familiarik duen, pentsamendu suizidak etortzen bazaizkio adi egon daitezen.\"\n"
+        "Answer: {\"Sign_or_Symptom\": [], \"Disease_or_Syndrome\": [], \"Pathologic_Function\": [], \"Finding\": [\"krisi\", \"pentsamendu suizidak\"], \"Other_Clinical_Disorder\": [], \"Patient\": [], \"H-Professional\": [], \"Other_Role\": []}\n\n"
+    )
 ]
 
 # ======================
@@ -212,7 +209,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model_path", default="models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
                     help="Path to GGUF model file")
-    ap.add_argument("--input", default="data/data_llm_io.jsonl")
+    ap.add_argument("--input", default="data/in.jsonl")
     ap.add_argument("--out", default="data/preds_llama31_8b_ex04.jsonl")
     ap.add_argument("--ctx", type=int, default=4096, help="Context window")
     ap.add_argument("--n_gpu_layers", type=int, default=0,
