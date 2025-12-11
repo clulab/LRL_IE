@@ -97,9 +97,9 @@ FEWSHOTS: List[str] = [
 # QA-style user template
 # ======================
 USER_TEMPLATE = (
-    "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?\n"
+    "Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?\n"
     "Text:\n<<<\n{input_text}\n>>>\n"
-    "Answer (a single JSON object with those six keys):\n"
+    "Answer (a single JSON object with those eight keys):\n"
 )
 
 # ---------- JSON helpers ----------
