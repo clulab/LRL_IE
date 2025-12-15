@@ -2,10 +2,10 @@
 import argparse
 import csv
 import json
+import yaml
 from pathlib import Path
 from typing import Dict, Set, List
 
-SCHEMA= ["Sign_or_Symptom", "Disease_or_Syndrome", "Pathologic_Function", "Finding", "Other_Clinical_Disorder", "Patient", "H-Professional", "Other_Role"]
 
 def load_jsonl(path: str) -> List[dict]:
     rows = []
@@ -19,9 +19,9 @@ def load_jsonl(path: str) -> List[dict]:
 def norm_span(s: str) -> str:
     return " ".join(s.split()).strip()
 
-def to_type_sets(obj: dict) -> Dict[str, Set[str]]:
-    out = {k:set() for k in SCHEMA}
-    for k in SCHEMA:
+def to_type_sets(obj: dict, schema: List[str]) -> Dict[str, Set[str]]:
+    out = {k:set() for k in schema}
+    for k in schema:
         vals = obj.get(k, [])
         if isinstance(vals, list):
             for v in vals:
@@ -39,24 +39,29 @@ def prf(tp, fp, fn):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--gold", default="data/data_llm_io.jsonl")
-    ap.add_argument("--pred", default="data/preds_llamacpp.jsonl")
+    ap.add_argument("--gold", default="data/input/data_llm_io.jsonl")
+    ap.add_argument("--pred", default="data/out/preds_llamacpp.jsonl")
     ap.add_argument("--out_csv", default="results/entity_metrics.csv")
+    ap.add_argument("--prompt", default="data/prompts/prompt.jsonl")
     args = ap.parse_args()
 
     gold_rows = load_jsonl(args.gold)
     pred_rows = load_jsonl(args.pred)
 
+    with open(args.prompt) as yml_file:
+        prompt_data = yaml.safe_load(yml_file)
+        schema = prompt_data['schema']
+
     gold_by_id = {r["ID"]: r for r in gold_rows}
     pred_by_id = {r["ID"]: r for r in pred_rows}
     common = sorted(set(gold_by_id) & set(pred_by_id))
 
-    per_type = {k: {"TP":0,"FP":0,"FN":0,"SUPPORT":0} for k in SCHEMA}
+    per_type = {k: {"TP":0,"FP":0,"FN":0,"SUPPORT":0} for k in schema}
 
     for _id in common:
-        g = to_type_sets(gold_by_id[_id].get("Output", {}))
-        p = to_type_sets(pred_by_id[_id].get("Pred", {}))
-        for k in SCHEMA:
+        g = to_type_sets(gold_by_id[_id].get("Output", {}), schema)
+        p = to_type_sets(pred_by_id[_id].get("Pred", {}), schema)
+        for k in schema:
             G = g[k]; P = p[k]
             tp = len(G & P)
             fp = len(P - G)
@@ -69,7 +74,7 @@ def main():
     # collect rows and micro/macro
     rows = []
     micro_tp = micro_fp = micro_fn = 0
-    for k in SCHEMA:
+    for k in schema:
         TP = per_type[k]["TP"]; FP = per_type[k]["FP"]; FN = per_type[k]["FN"]; S = per_type[k]["SUPPORT"]
         P,R,F = prf(TP,FP,FN)
         micro_tp += TP; micro_fp += FP; micro_fn += FN
