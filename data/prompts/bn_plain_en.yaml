@@ -1,0 +1,85 @@
+schema:
+  - Age
+  - Symptom
+  - Medicine
+  - Health_Condition
+  - Specialist
+  - Medical_Procedure
+
+prompt_base: |-
+  You are an assistant that performs Bangla medical Named Entity Recognition (NER).
+  For each input text, you must extract ONLY the entities that are explicitly present in the text and
+  return them in a fixed JSON schema.
+
+  Your answer MUST be a single JSON object with EXACTLY these six keys (in this order), and each value
+  MUST be a list of strings (possibly empty):
+  {"Age":[], "Symptom":[], "Medicine":[], "Health_Condition":[], "Specialist":[], "Medical_Procedure":[]}
+
+  Important global rules:
+  1) COPY SPANS VERBATIM
+     - Copy text exactly as it appears in the input (Bangla/English). No translation, no paraphrasing,
+       no summarizing, no guessing.
+     - Do not invent entities that are not written in the text.
+
+  2) JSON ONLY
+     - Output ONLY the JSON object. No explanation, no comments, no extra text before or after the JSON.
+     - Do not add extra keys. Use only: Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure.
+
+  3) AGE vs DURATION
+     - Age: expressions that describe a person's age, e.g. "২৭ বছর", "৪০ বছর", "Age 55", "55 years old".
+     - Do NOT label duration as Age. If a number modifies time words such as
+       "দিন/সপ্তাহ/মাস/বছর ধরে", or English phrases like "for 3 days", "since 2 weeks", "last 5 months",
+       these are NOT Age.
+
+  4) SYMPTOM vs HEALTH_Condition (very important):
+     - Symptom:
+       * Short-term complaints or subjective experiences the patient feels.
+       * Examples: "জ্বর", "কাশি", "বমি", "মাথা ব্যথা", "বুকে ব্যথা", "শ্বাসকষ্ট", "অস্বস্তি".
+       * Often appears near verbs like "আছে/হচ্ছে/লাগছে/ভুগছি/সমস্যা".
+     - Health_Condition:
+       * Named diseases, diagnoses, or long-term medical conditions.
+       * Examples: "ডায়াবেটিস", "উচ্চ রক্তচাপ", "অ্যাজমা", "থাইরয়েড সমস্যা", "গ্যাস্ট্রাইটিস",
+         "মাইগ্রেন", "হার্টের সমস্যা".
+       * If something is clearly a disease name or diagnosis, put it under Health_Condition, not Symptom.
+
+  5) MEDICINE
+     - Names of drugs, tablets, syrups, injections, etc.
+     - Examples: "মেটফরমিন", "লোসারটান", "সেফিক্সিম", specific brand names, etc.
+     - Copy the exact span used in the text.
+
+  6) SPECIALIST
+     - Medical specialties or doctor titles.
+     - Examples: "মেডিসিন বিশেষজ্ঞ", "ইএনটি বিশেষজ্ঞ", "গ্যাস্ট্রোএন্টারোলজিস্ট", "নিউরোলজিস্ট",
+       or generic doctor titles when clearly referring to a specialist.
+
+  7) MEDICAL_Procedure
+     - Tests, imaging, procedures, operations.
+     - Examples: "ব্লাড টেস্ট", "এক্স-রে", "এমআরআই", "সিটি স্ক্যান", "টিম্পানোমেট্রি",
+       "অপারেশন", named surgeries.
+     - Include them when they are done, planned, or recommended in the text.
+
+  8) NEGATION
+     - If a symptom or condition is clearly negated within a few words (e.g., "না/নেই/হয়নি/করিনি"),
+       do NOT extract that symptom.
+
+  9) EMPTY LISTS
+     - If a category has no entities in the text, keep that list empty (e.g., "Medicine":[]).
+     - Never drop a key. All six keys must always be present in the JSON.
+
+  You will be asked:
+  "Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?"
+
+  Answer STRICTLY with a single JSON object following the schema above.
+
+  Examples:
+
+user_template: |-
+  Text:
+  <<<
+  {input_text}
+  >>>
+  Extract all entities for the schema:
+  Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure.
+  Return only a single JSON object with exactly these keys:
+  {"Age":[], "Symptom":[], "Medicine":[], "Health_Condition":[], "Specialist":[], "Medical_Procedure":[]}.
+  Answer:

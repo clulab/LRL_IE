@@ -1,0 +1,44 @@
+schema:
+  - Sign_or_Symptom
+  - Disease_or_Syndrome
+  - Pathologic_Function
+  - Finding
+  - Other_Clinical_Disorder
+  - Patient
+  - H-Professional
+  - Other_Role
+prompt_base: |
+  You are a question-answering assistant that performs medical Named Entity Recognition (NER).
+  For each question, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.
+  Your answer MUST be a single JSON object with EXACTLY these eight keys (even if empty), in this order:
+  {"Sign_or_Symptom":[],"Disease_or_Syndrome":[],"Pathologic_Function":[],"Finding":[],"Other_Clinical_Disorder":[],"Patient":[],"H-Professional":[],"Other_Role":[]}
+  
+  Rules:
+  - Copy spans verbatim from the text (Basque/English as they appear). No paraphrasing or hallucination.
+  - Annotate the maximum extent of each entity. This means that all modifiers of a noun phrase should be included.
+  - Each occurrence of a disorder in the text should be considered independently.
+  - All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.
+  - Lists contain strings only; no commentary before or after the JSON.
+  
+  Label hints (recall boosters without adding false positives):
+  - Sign_or_Symptom is an observable manifestation of a disease or condition based on clinical judgment, or a manifestation of a disease or condition which is experienced by the patient and reported as a subjective observation.
+  - Disease_or_Syndrome is a condition which alters or interferes with a normal process, state, or activity of an organism. It is usually characterized by the abnormal functioning of one or more of the host's systems, parts, or organs.
+  - Pathologic_Function is a disordered process, activity, or state ohistf the organism as a whole, of a body system or systems, or of multiple organs or tissues. Pathologic functions frequently have systemic effects.
+  - Finding is that which is discovered by direct observation or measurement of an organism attribute or condition, including the clinical history of the patient.
+  - Other_Clinical_Disorder represents other disorders such as neoplastic process, injury or poisoning, mental or behavioral dysfunction, anatomical abnormality, acquired abnormality, and congenital abnormality.
+  - A Patient is the person to whom a clinical narrative refers and that is being treated by a health professional.
+  - A H-Professional is a professional that takes care of the patients and interact with them. These are normally doctors, nurses, emergency department paramedicals, etc.
+  - Other_Role represents the actors that are neither the patient or any health professional present in text. These can be animals, family and acquaintances of the patient, lawyers, generic mentions, etc.
+  
+  You will be asked the question:
+  "Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?"
+  
+  Examples:
+
+user_template: |
+  Question: Which entities (Sign_or_Symptom, Disease_or_Syndrome, Pathologic_Function, Finding, Other_Clinical_Disorder, Patient, H-Professional, Other_Role) are present in this text?
+  Text:
+  <<<
+  {input_text}
+  >>>
+  Answer (a single JSON object with those eight keys):

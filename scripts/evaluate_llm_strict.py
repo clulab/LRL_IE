@@ -1,91 +1,52 @@
-# entity_llm.py
 import argparse
 import csv
-import json
-import yaml
+import sys
 from pathlib import Path
-from typing import Dict, Set, List
 
+# Ensure repo root on path when run as a script
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
 
-def load_jsonl(path: str) -> List[dict]:
-    rows = []
-    for line in Path(path).read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        rows.append(json.loads(line))
-    return rows
-
-def norm_span(s: str) -> str:
-    return " ".join(s.split()).strip()
-
-def to_type_sets(obj: dict, schema: List[str]) -> Dict[str, Set[str]]:
-    out = {k:set() for k in schema}
-    for k in schema:
-        vals = obj.get(k, [])
-        if isinstance(vals, list):
-            for v in vals:
-                if isinstance(v, str):
-                    vv = norm_span(v)
-                    if vv:
-                        out[k].add(vv)
-    return out
-
-def prf(tp, fp, fn):
-    p = tp / (tp + fp) if (tp + fp) else 0.0
-    r = tp / (tp + fn) if (tp + fn) else 0.0
-    f = 2*p*r/(p+r) if (p+r) else 0.0
-    return p, r, f
+from lrl_ie.eval import evaluate
+from lrl_ie.config import load_experiment_config
+from lrl_ie.io import load_jsonl, load_yaml
+from lrl_ie.paths import resolve_pred_out_path, resolve_templated_path
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--gold", default="data/input/data_llm_io.jsonl")
-    ap.add_argument("--pred", default="data/out/preds_llamacpp.jsonl")
-    ap.add_argument("--out_csv", default="results/entity_metrics.csv")
-    ap.add_argument("--prompt", default="data/prompts/prompt.jsonl")
+    ap.add_argument("--experiment", required=True, help="Experiment name defined in experiments.yaml")
+    ap.add_argument("--model", required=True, help="Model block name in configs/config.yaml (e.g., llama, qwen)")
+    ap.add_argument("--config", default="configs/config.yaml")
+    ap.add_argument("--experiments", default="configs/experiments.yaml")
     args = ap.parse_args()
 
-    gold_rows = load_jsonl(args.gold)
-    pred_rows = load_jsonl(args.pred)
+    cfg = load_experiment_config(args.config, args.experiments, args.experiment, args.model)
+    model_name = cfg.get("model", args.model)
 
-    with open(args.prompt) as yml_file:
-        prompt_data = yaml.safe_load(yml_file)
-        schema = prompt_data['schema']
+    gold_path = cfg["input"]
+    pred_path = resolve_pred_out_path(str(cfg["out"]), args.experiment, model_name)
+    prompt_path = cfg["prompt"]
+    results_path = resolve_templated_path(str(cfg["results_out"]), args.experiment, model_name)
 
-    gold_by_id = {r["ID"]: r for r in gold_rows}
-    pred_by_id = {r["ID"]: r for r in pred_rows}
-    common = sorted(set(gold_by_id) & set(pred_by_id))
+    gold_rows = load_jsonl(gold_path)
+    pred_rows = load_jsonl(pred_path)
+    gold_ids = {r.get("ID") for r in gold_rows if "ID" in r}
+    pred_ids = {r.get("ID") for r in pred_rows if "ID" in r}
+    common_ids = gold_ids & pred_ids
 
-    per_type = {k: {"TP":0,"FP":0,"FN":0,"SUPPORT":0} for k in schema}
+    prompt_data = load_yaml(prompt_path)
+    schema = prompt_data["schema"]
 
-    for _id in common:
-        g = to_type_sets(gold_by_id[_id].get("Output", {}), schema)
-        p = to_type_sets(pred_by_id[_id].get("Pred", {}), schema)
-        for k in schema:
-            G = g[k]; P = p[k]
-            tp = len(G & P)
-            fp = len(P - G)
-            fn = len(G - P)
-            per_type[k]["TP"] += tp
-            per_type[k]["FP"] += fp
-            per_type[k]["FN"] += fn
-            per_type[k]["SUPPORT"] += len(G)
+    rows, macro, micro = evaluate(gold_rows, pred_rows, schema)
+    macro_p, macro_r, macro_f = macro
+    micro_p, micro_r, micro_f = micro
 
-    # collect rows and micro/macro
-    rows = []
-    micro_tp = micro_fp = micro_fn = 0
-    for k in schema:
-        TP = per_type[k]["TP"]; FP = per_type[k]["FP"]; FN = per_type[k]["FN"]; S = per_type[k]["SUPPORT"]
-        P,R,F = prf(TP,FP,FN)
-        micro_tp += TP; micro_fp += FP; micro_fn += FN
-        caught = (TP / S * 100.0) if S else 0.0
-        rows.append({"Type":k,"Precision":P,"Recall":R,"F1":F,"Support":S,"Correctly Caught (%)":caught})
-
-    macro_p = sum(r["Precision"] for r in rows)/len(rows) if rows else 0.0
-    macro_r = sum(r["Recall"] for r in rows)/len(rows) if rows else 0.0
-    macro_f = sum(r["F1"] for r in rows)/len(rows) if rows else 0.0
-
-    micro_p, micro_r, micro_f = prf(micro_tp, micro_fp, micro_fn)
+    print(f"Experiment: {args.experiment}")
+    print(f"Model: {model_name}")
+    print(f"Gold: {gold_path}")
+    print(f"Pred: {pred_path}")
+    print(f"# of Samples: {len(common_ids)}")
 
     # pretty print
     def fmt(x): return f"{x:.4f}"
@@ -101,16 +62,22 @@ def main():
     print(f"Precision={fmt(micro_p)}  Recall={fmt(micro_r)}  F1={fmt(micro_f)}")
 
     # save csv
-    Path(args.out_csv).parent.mkdir(parents=True, exist_ok=True)
-    with Path(args.out_csv).open("w", newline="", encoding="utf-8") as f:
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    with results_path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
+        w.writerow(["Experiment", args.experiment, "", "", "", ""])
+        w.writerow(["Model", model_name, "", "", "", ""])
+        w.writerow(["Gold", gold_path, "", "", "", ""])
+        w.writerow(["Pred", pred_path, "", "", "", ""])
+        w.writerow(["# of Samples", len(common_ids), "", "", "", ""])
+        w.writerow([])
         w.writerow(["Type","Precision","Recall","F1","Support","Correctly Caught (%)"])
         for r in rows:
             w.writerow([r["Type"], f"{r['Precision']:.6f}", f"{r['Recall']:.6f}", f"{r['F1']:.6f}", r["Support"], f"{r['Correctly Caught (%)']:.2f}"])
         w.writerow([])
         w.writerow(["Macro", f"{macro_p:.6f}", f"{macro_r:.6f}", f"{macro_f:.6f}", "", ""])
         w.writerow(["Micro", f"{micro_p:.6f}", f"{micro_r:.6f}", f"{micro_f:.6f}", "", ""])
-    print(f"\nSaved CSV -> {args.out_csv}")
+    print(f"\nSaved CSV -> {results_path}")
 
 if __name__ == "__main__":
     main()

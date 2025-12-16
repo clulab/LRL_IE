@@ -1,0 +1,40 @@
+bn_qa_en:
+  input: data/input/bn.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/bn_qa_en.yaml
+  examples: data/examples/bn_en_10.jsonl
+
+bn_qa_bn:
+  input: data/input/bn.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/bn_qa_bn.yaml
+  examples: data/examples/bn_bn_10.jsonl
+
+bn_plain_en:
+  input: data/input/bn.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/bn_plain_en.yaml
+  examples: data/examples/bn_en_10.jsonl
+  temperature: 0.0
+
+eu_qa_en:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_qa_en.yaml
+  examples: data/examples/eu_en_10.jsonl
+
+eu_qa_eu:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_qa_eu.yaml
+  examples: data/examples/eu_eu_10.jsonl

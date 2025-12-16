@@ -1,0 +1,4 @@
+pyyaml
+llama-cpp-python==0.3.16
+transformers==4.40.1
+torch
