@@ -110,3 +110,24 @@ python evaluate_details.py \
 ========================================
 
 other things will be same as it is 
+
+python scripts/main_qwen3_8b_final_ex.py \
+  --prompt_variant zero_shot \
+  --model_path models/Qwen3-14B-Q4_K_M.gguf \
+  --input data/data_llm_io_top50.jsonl \
+  --out output/preds_qwen3_14b_zeroshot_few.jsonl \
+  --n_gpu_layers -1 \
+  --ctx 4096 \
+  --temperature 0.0 \
+  --max_tokens 256
+
+python evaluate_llm_strict.py \
+  --gold data/data_llm_io.jsonl \
+  --pred output/preds_qwen3_14b_zeroshot_few.jsonl \
+  --out_csv results/metrics_qwen_14b_zero_shot_few.csv
+
+python evaluate_details.py \
+  --gold data/data_llm_io.jsonl \
+  --pred output/preds_llama31_14b_zero_shot_few.jsonl \
+  --out_csv results/metrics_qwen_14zero_shot_few.csv
+
