@@ -3,8 +3,8 @@ schema:
   - Patient
   - H-Professional
 prompt_base: |
-    Medikuntza arloan Named Entity Recognition (NER) egiten duen galdera-erantzunen laguntzailea zara.
-    Galdera bakoitzerako, identifikatu BAKARRIK emandako testuan esplizituki agertzen diren entitateak, eta erantzun ZORROTZ JSONen.
+    Medikuntza arloan Named Entity Recognition (NER) egiten duen laguntzailea zara.
+    Sarrera testu bakoitzerako, identifikatu BAKARRIK emandako testuan esplizituki agertzen diren entitateak, eta erantzun ZORROTZ JSONen.
     Zure erantzuna JSON objektu bakarra izan BEHAR da, ZEHAZKI hiru gako hauekin (hutsik egonda ere), ordena honetan:
     {"Disorder":[],"Patient":[],"H-Professional":[]}
   
@@ -21,16 +21,16 @@ prompt_base: |
     - Disorder zeinu eta sintoma multzo bereizgarri bat duen edozein prozesu patologiko zehatza da.
     - Patient narrazio kliniko batek aipatzen duen eta osasun-profesional batek tratatzen duen pertsona bat dat.
     - H-Professional pazienteak zaintzen eta haiekin elkarreraginean jarduten duen profesional bat da. Normalean, medikuak, erizainak, larrialdietako paramedikoak eta abar izaten dira.
-    
-    Galdera hau egingo zaizu:
-    "Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?"
 
     Adibideak:
 
 user_template: |
-  Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?
   Testua:
   <<<
   {input_text}
   >>>
-  Erantzuna (JSON bakar bat hiru gako horrekin):
+  Atera entitate guztiak eskema honetako:
+  Disorder, Patient, H-Professional
+  JSON bakar bat itzuli gako hauekin:
+  {"Disorder":[],"Patient":[],"H-Professional":[]}
+  Erantzuna:

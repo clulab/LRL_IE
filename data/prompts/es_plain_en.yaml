@@ -3,13 +3,13 @@ schema:
   - Patient
   - H-Professional
 prompt_base: |
-  You are a question-answering assistant that performs medical Named Entity Recognition (NER).
-  For each question, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.
+  You are an assistant that performs medical Named Entity Recognition (NER) in Spanish.
+  For each input text, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.
   Your answer MUST be a single JSON object with EXACTLY these three keys (even if empty), in this order:
   {"Disorder":[],"Patient":[],"H-Professional":[]}
   
   Rules:
-  - Copy spans verbatim from the text (Basque/English as they appear). No paraphrasing or hallucination.
+  - Copy spans verbatim from the text (Spanish/English as they appear). No paraphrasing or hallucination.
   - Annotate the maximum extent of each entity. This means that all modifiers of a noun phrase should be included.
   - Each occurrence of a disorder in the text should be considered independently.
   - All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.
@@ -22,15 +22,15 @@ prompt_base: |
   - A Patient is the person to whom a clinical narrative refers and that is being treated by a health professional.
   - A H-Professional is a professional that takes care of the patients and interact with them. These are normally doctors, nurses, emergency department paramedicals, etc. These are not institutions or departments.
   
-  You will be asked the question:
-  "Which entities (Disorder, Patient, H-Professional) are present in this text?"
-  
   Examples:
 
 user_template: |
-  Question: Which entities (Disorder, Patient, H-Professional) are present in this text?
   Text:
   <<<
   {input_text}
   >>>
-  Answer (a single JSON object with those three keys):
+  Extract all entities for the schema:
+  Disorder, Patient, H-Professional
+  Return only a single JSON object with exactly these keys:
+  {"Disorder":[],"Patient":[],"H-Professional":[]}
+  Answer:

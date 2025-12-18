@@ -14,7 +14,7 @@ prompt_base: |
   - Each occurrence of a disorder in the text should be considered independently.
   - All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.
   - Entities cannot be single possessive pronouns.
-  - Do not include leading articles in the entity spans.
+  - Do not include leading articles in the entities.
   - Lists contain strings only; no commentary before or after the JSON.
   
   Label hints (recall boosters without adding false positives):
