@@ -9,7 +9,7 @@ prompt_base: |
   {"Disorder":[],"Patient":[],"H-Professional":[]}
   
   Rules:
-  - Copy spans verbatim from the text (Basque/English as they appear). No paraphrasing or hallucination.
+  - Copy spans verbatim from the text. No paraphrasing or hallucination. Never change the case.
   - Annotate the maximum extent of each entity. This means that all modifiers of a noun phrase should be included.
   - Each occurrence of a disorder in the text should be considered independently.
   - All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.
