@@ -238,7 +238,7 @@ en_tr_en:
     - answer
 
 en_qa_en:
-  input: data/input/eu.jsonl
+  input: data/input/en.jsonl
   out: data/out/preds_{experiment}_{model}.jsonl
   raw_out: data/out/raw_{experiment}_{model}.jsonl
   results_out: results/metrics_{experiment}_{model}.csv
