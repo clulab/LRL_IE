@@ -18,6 +18,7 @@ from lrl_ie.prompting import build_messages
 from lrl_ie.qwen import chatml_prompt, strip_think
 from lrl_ie.paths import resolve_pred_out_path
 
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--experiment", required=True, help="Experiment name defined in experiments.yaml")
@@ -58,8 +59,16 @@ def main():
 
     prompt_data = load_yaml(cfg["prompt"])
 
-    with open(cfg["examples"], encoding="utf-8") as json_file:
-        fewshots = [json.loads(ex) for ex in json_file]
+    fewshots = []
+    if "examples" in cfg:
+        with open(cfg["examples"], encoding="utf-8") as json_file:
+            if cfg["examples"].endswith('.jsonl'):
+                fewshots = [json.loads(ex) for ex in json_file]
+            else:
+                examples = json.load(json_file)
+                for ex in examples:
+                    shot = "".join([ex[field] for field in cfg["example_fields"]])
+                    fewshots.append(shot)
 
     records = list(load_jsonl(cfg["input"]))
     if args.debug_samples and args.debug_samples > 0:

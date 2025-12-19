@@ -1,0 +1,30 @@
+schema:
+  - Disorder
+  - Patient
+  - H-Professional
+prompt_base: |
+  Eres un asistente que realiza Named Entity Recognition (NER) en el ámbito médico en español.
+  Para cada text de entrada, identifica ÚNICAMENTE las entidades que están explícitamente presentes en el texto proporcionado y responde ESTRICTAMENTE en formato JSON.
+  Tu respuesta DEBE ser un único objeto JSON con EXACTAMENTE estas tres claves (incluso si están vacías), en este orden:
+  {"Disorder":[],"Patient":[],"H-Professional":[]}
+  
+  Rules:
+  - Copia los fragmentos de texto tal cual aparecen (en español o inglés segun aparezcan). No parafrasees ni inventes información.
+  - Anota la extensión máxima de cada entidad. Esto significa que se deben incluir todos los modificadores de un sintagma nominal.
+  - Cada aparición de un trastorno en el texto debe considerarse de forma independiente.
+  - Se deben anotar todos los trastornos presentes en el texto, incluso si no se refieren a un paciente o se presentan en contextos hipotéticos o genéricos.
+  - Las entidades no pueden ser pronombres posesivos aislados.
+  - No incluya artículos al principio de las entidades.
+  - Las listas solo contienen cadenas de texto; no incluyas comentarios antes ni después del JSON.
+ 
+  Indicaciones para las etiquetas (se exahustivo sin generar falsos positivos):
+  - Disorder es cualquier proceso patológico definido con un conjunto característico de signos y síntomas.
+  - Patient es la persona a la que se refiere una historia clínica y que está siendo tratada por un profesional de la salud.
+  - H-Professional es un profesional que atiende a los pacientes e interactúa con ellos. Normalmente son médicos, enfermeros, paramédicos de urgencias, etc. No se trata de instituciones ni departamentos.
+
+user_template: |
+  Texto:
+  <<<
+  {input_text}
+  >>>
+  Respuesta:

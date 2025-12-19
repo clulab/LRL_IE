@@ -1,0 +1,30 @@
+schema:
+  - Disorder
+  - Patient
+  - H-Professional
+prompt_base: |
+    Medikuntza arloan Named Entity Recognition (NER) egiten duen laguntzailea zara.
+    Sarrera testu bakoitzerako, identifikatu BAKARRIK emandako testuan esplizituki agertzen diren entitateak, eta erantzun ZORROTZ JSONen.
+    Zure erantzuna JSON objektu bakarra izan BEHAR da, ZEHAZKI hiru gako hauekin (hutsik egonda ere), ordena honetan:
+    {"Disorder":[],"Patient":[],"H-Professional":[]}
+  
+    Arauak:
+    - Testu-zatiak hitzez hitz kopiatu (euskaraz/ingelesez agertzen diren bezala). Ez parafrasirik, ez haluzinaziorik.
+    - Idatzi erakunde bakoitzaren gehieneko hedadura. Horrek esan nahi du izen-sintagma baten modifikatzaile guztiak sartu behar direla.
+    - Testuan nahasmendu baten agerpen bakoitza independenteki hartu behar da kontuan.
+    - Testuan agertzen diren asaldura guztiak anotatu egin behar dira, nahiz eta pazienteari ez dagozkion edo testuinguru hipotetiko edo generikoetan aurkezten diren.
+    - Entitateak ezin dira izenordain posesibo bakarrak izan.
+    - Ez sartu artikulurik entitateen hasieran.
+    - Zerrendek textu kateak bakarrik dituzte; ez dago iruzkinik JSON aurretik edo ondoren.
+  
+    Etiketen argibideak (zehatza izan positibo faltsurik gehitu gabe):
+    - Disorder zeinu eta sintoma multzo bereizgarri bat duen edozein prozesu patologiko zehatza da.
+    - Patient narrazio kliniko batek aipatzen duen eta osasun-profesional batek tratatzen duen pertsona bat dat.
+    - H-Professional pazienteak zaintzen eta haiekin elkarreraginean jarduten duen profesional bat da. Normalean, medikuak, erizainak, larrialdietako paramedikoak eta abar izaten dira.
+
+user_template: |
+  Testua:
+  <<<
+  {input_text}
+  >>>
+  Erantzuna:

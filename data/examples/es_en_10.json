@@ -2,70 +2,70 @@
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"El reflejo luminoso sobre la cornea nos hace sospechar una fijaci\u00f3n exc\u00e9ntrica en ambos ojos.\"\n",
-        "answer": "Answer: \"{'Disorder': ['fijaci\u00f3n exc\u00e9ntrica'], 'Patient': [], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['fijaci\u00f3n exc\u00e9ntrica'], 'Patient': [], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"The light reflex on the cornea suggests eccentric fixation in both eyes.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"El paciente se mantuvo asintom\u00e1tico hasta marzo de 2007 cuando acudi\u00f3 a nuestro hospital por un cuadro de astenia, inestabilidad y dolor abdominal seguido de hematemesis masiva con afectaci\u00f3n cl\u00ednica y hematol\u00f3gica (Hb 7,1g, hematocrito 21,5%).\"\n",
-        "answer": "Answer: \"{'Disorder': ['astenia', 'inestabilidad', 'dolor abdominal', 'hematemesis masiva'], 'Patient': ['El paciente'], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['astenia', 'inestabilidad', 'dolor abdominal', 'hematemesis masiva'], 'Patient': ['El paciente'], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"The patient remained asymptomatic until March 2007 when he came to our hospital with symptoms of asthenia, instability, and abdominal pain followed by massive hematemesis with clinical and hematological involvement (Hb 7.1g, hematocrit 21.5%).\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Con el diagn\u00f3stico de neoformaci\u00f3n renal estadio T3bN0M0 con trombo tumoral nivel II, se decide intervenir, conjuntamente con el servicio de cirug\u00eda cardiaca de nuestro centro, realizando esternotom\u00eda y laparotom\u00eda subcostal izquierda y, previa liberaci\u00f3n del \u00e1ngulo espl\u00e9nico del colon mediante apertura del retroperitoneo a nivel del mesenterio, nefrectom\u00eda radical izquierda permaneciendo la pieza de nefrectom\u00eda anclada por la vena renal trombosada.\"\n",
-        "answer": "Answer: \"{'Disorder': ['neoformaci\u00f3n renal', 'trombo tumoral', 'la vena renal trombosada'], 'Patient': [], 'H-Professional': ['el servicio de cirug\u00eda']}\"\n",
+        "answer": "Answer: {'Disorder': ['neoformaci\u00f3n renal', 'trombo tumoral', 'la vena renal trombosada'], 'Patient': [], 'H-Professional': ['el servicio de cirug\u00eda']}\n",
         "translation": "English translation of the text: \"With a diagnosis of renal neoplasm stage T3bN0M0 with a level II tumor thrombus, it was decided to perform surgery, in conjunction with the cardiac surgery department of our center, performing a sternotomy and left subcostal laparotomy and, after freeing the splenic flexure of the colon by opening the retroperitoneum at the level of the mesentery, a left radical nephrectomy was performed, with the nephrectomy specimen remaining anchored by the thrombosed renal vein.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Remitido a oftalmolog\u00eda a los 40 d\u00edas, para estudio de fondo de ojo, presentaba la siguiente exploraci\u00f3n oftalmol\u00f3gica: la agudeza visual (AV) era de 0,8 en ambos ojos, la presi\u00f3n intraocular (PIO) de 13 mm de Hg y en el fondo de ojo derecho (OD) se observ\u00f3 una microhemorragia por encima de papila y cuatro \u00e9mbolos de colesterol y en el fondo del ojo izquierdo (OI) otros dos \u00e9mbolos localizados en rama temporal y nasal.\"\n",
-        "answer": "Answer: \"{'Disorder': ['microhemorragia', '\u00e9mbolos de colesterol', '\u00e9mbolos'], 'Patient': [], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['microhemorragia', '\u00e9mbolos de colesterol', '\u00e9mbolos'], 'Patient': [], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"Referred to ophthalmology 40 days later for a fundus examination, the following ophthalmological examination was performed: visual acuity (VA) was 0.8 in both eyes, intraocular pressure (IOP) was 13 mm Hg, and in the right eye fundus (OD) a microhemorrhage was observed above the optic disc and four cholesterol emboli, and in the left eye fundus (OS) two other emboli were located in the temporal and nasal branches.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Hombre de 46 a\u00f1os, sin antecedentes patol\u00f3gicos relevantes, no fumador.\"\n",
-        "answer": "Answer: \"{'Disorder': ['fumador'], 'Patient': ['Hombre de 46 a\u00f1os'], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['fumador'], 'Patient': ['Hombre de 46 a\u00f1os'], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"A 46-year-old man with no relevant medical history, a non-smoker.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Paciente de 86 a\u00f1os de edad consulta al equipo de cirug\u00eda maxilofacial del Complejo Hospitalario San Jos\u00e9 por un aumento de volumen asintom\u00e1tico, de evoluci\u00f3n indeterminada en la zona anterior mandibular.\"\n",
-        "answer": "Answer: \"{'Disorder': ['aumento de volumen'], 'Patient': ['Paciente de 86 a\u00f1os de edad'], 'H-Professional': ['al equipo de cirug\u00eda maxilofacial del Complejo Hospitalario San Jos\u00e9']}\"\n",
+        "answer": "Answer: {'Disorder': ['aumento de volumen'], 'Patient': ['Paciente de 86 a\u00f1os de edad'], 'H-Professional': ['al equipo de cirug\u00eda maxilofacial del Complejo Hospitalario San Jos\u00e9']}\n",
         "translation": "English translation of the text: \"An 86-year-old patient consulted the maxillofacial surgery team at the San José Hospital Complex for an asymptomatic increase in volume of indeterminate duration in the anterior mandibular area.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Estas discromatopsias desaparecieron en 24 horas.\"\n",
-        "answer": "Answer: \"{'Disorder': ['discromatopsias'], 'Patient': [], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['discromatopsias'], 'Patient': [], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"These dyschromatopsias disappeared within 24 hours.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"Mujer de 51 a\u00f1os de edad, con antecedentes de anexectom\u00eda unilateral por endometriosis, que tras 24 horas de evoluci\u00f3n presenta fiebre de hasta 40 oC y odinofagia, remitiendo dicha sintomatolog\u00eda parcialmente con antiinflamatorios no esteroideos (AINE).\"\n",
-        "answer": "Answer: \"{'Disorder': ['endometriosis', 'fiebre', 'odinofagia'], 'Patient': ['Mujer de 51 a\u00f1os de edad'], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['endometriosis', 'fiebre', 'odinofagia'], 'Patient': ['Mujer de 51 a\u00f1os de edad'], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"A 51-year-old woman with a history of unilateral adnexectomy due to endometriosis, who after 24 hours developed a fever of up to 40°C and odynophagia, with partial remission of these symptoms with non-steroidal anti-inflammatory drugs (NSAIDs).\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"En los \u00faltimos 6 meses hab\u00eda presentado 3 episodios de infecci\u00f3n del tracto urinario bajo con urocultivos positivos a E. coli tratados por su m\u00e9dico de cabecera.\"\n",
-        "answer": "Answer: \"{'Disorder': ['infecci\u00f3n del tracto urinario'], 'Patient': [], 'H-Professional': ['su m\u00e9dico de cabecera']}\"\n",
+        "answer": "Answer: {'Disorder': ['infecci\u00f3n del tracto urinario'], 'Patient': [], 'H-Professional': ['su m\u00e9dico de cabecera']}\n",
         "translation": "English translation of the text: \"In the last 6 months, she had presented with 3 episodes of lower urinary tract infection with positive urine cultures for E. coli, treated by her general practitioner.\"\n",
         "description": "Description of text: \n"
     },
     {
         "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
         "text": "Text: \"El cuadro fue interpretado como de origen vascular, bien posicional, o bien derivado de los antecedentes migra\u00f1osos de la paciente, siendo sometida emp\u00edricamente a tratamiento con dexametasona y vasodilatadores.\"\n",
-        "answer": "Answer: \"{'Disorder': ['migra\u00f1osos'], 'Patient': ['la paciente'], 'H-Professional': []}\"\n",
+        "answer": "Answer: {'Disorder': ['migra\u00f1osos'], 'Patient': ['la paciente'], 'H-Professional': []}\n",
         "translation": "English translation of the text: \"The condition was interpreted as being of vascular origin, either positional or related to the patient's history of migraines, and she was empirically treated with dexamethasone and vasodilators.\"\n",
         "description": "Description of text: \n"
     }

@@ -1,0 +1,30 @@
+schema:
+  - Disorder
+  - Patient
+  - H-Professional
+prompt_base: |
+  You are an assistant that performs medical Named Entity Recognition (NER) in Basque.
+  For each input text, identify ONLY the entities that are explicitly present in the provided text and answer STRICTLY in JSON.
+  Your answer MUST be a single JSON object with EXACTLY these three keys (even if empty), in this order:
+  {"Disorder":[],"Patient":[],"H-Professional":[]}
+  
+  Rules:
+  - Copy spans verbatim from the text (Basque/English as they appear). No paraphrasing or hallucination.
+  - Annotate the maximum extent of each entity. This means that all modifiers of a noun phrase should be included.
+  - Each occurrence of a disorder in the text should be considered independently.
+  - All the disorders present in the text are to be annotated, even if they do not pertain to the patient or are presented in hypothetical or generic contexts.
+  - Entities cannot be single possessive pronouns.
+  - Do not include leading articles in the entities.
+  - Lists contain strings only; no commentary before or after the JSON.
+  
+  Label hints (recall boosters without adding false positives):
+  - Disorder is any definite pathologic process with a characteristic set of signs and symptoms.
+  - A Patient is the person to whom a clinical narrative refers and that is being treated by a health professional.
+  - A H-Professional is a professional that takes care of the patients and interact with them. These are normally doctors, nurses, emergency department paramedicals, etc. These are not institutions or departments.
+  
+user_template: |
+  Text:
+  <<<
+  {input_text}
+  >>>
+  Answer:

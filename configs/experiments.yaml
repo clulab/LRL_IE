@@ -1,3 +1,7 @@
+#
+#  Bangla Experiments
+#
+
 bn_qa_en:
   input: data/input/bn.jsonl
   out: data/out/preds_{experiment}_{model}.jsonl
@@ -23,13 +27,81 @@ bn_plain_en:
   examples: data/examples/bn_en_10.jsonl
   temperature: 0.0
 
+#
+#  Basque Experiments
+#
+
+eu_zshot_en:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_zshot_en.yaml
+
+eu_zshot_eu:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_zshot_eu.yaml
+
+eu_plain_en:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_plain_en.yaml
+  examples: data/examples/eu_en_10.json
+  example_fields:
+    - text
+    - answer
+
+eu_plain_eu:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_plain_eu.yaml
+  examples: data/examples/eu_eu_10.json
+  example_fields:
+    - text
+    - answer
+
+eu_tr_en:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_plain_en.yaml
+  examples: data/examples/eu_en_10.json
+  example_fields:
+    - translation
+    - text
+    - answer
+
+eu_tr_eu:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/eu_plain_eu.yaml
+  examples: data/examples/eu_eu_10.json
+  example_fields:
+    - translation
+    - text
+    - answer
+
 eu_qa_en:
   input: data/input/eu.jsonl
   out: data/out/preds_{experiment}_{model}.jsonl
   raw_out: data/out/raw_{experiment}_{model}.jsonl
   results_out: results/metrics_{experiment}_{model}.csv
   prompt: data/prompts/eu_qa_en.yaml
-  examples: data/examples/eu_en_10.jsonl
+  examples: data/examples/eu_en_10.json
+  example_fields:
+    - question
+    - text
+    - answer
 
 eu_qa_eu:
   input: data/input/eu.jsonl
@@ -37,4 +109,142 @@ eu_qa_eu:
   raw_out: data/out/raw_{experiment}_{model}.jsonl
   results_out: results/metrics_{experiment}_{model}.csv
   prompt: data/prompts/eu_qa_eu.yaml
-  examples: data/examples/eu_eu_10.jsonl
+  examples: data/examples/eu_eu_10.json
+  example_fields:
+    - question
+    - text
+    - answer
+
+#
+#  Spanish Experiments
+#
+
+es_zshot_en:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_zshot_en.yaml
+
+es_zshot_es:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_zshot_es.yaml
+
+es_plain_en:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_plain_en.yaml
+  examples: data/examples/es_en_10.json
+  example_fields:
+    - text
+    - answer
+
+es_plain_es:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_plain_es.yaml
+  examples: data/examples/es_es_10.json
+  example_fields:
+    - text
+    - answer
+
+es_tr_en:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_plain_en.yaml
+  examples: data/examples/es_en_10.json
+  example_fields:
+    - translation
+    - text
+    - answer
+
+es_tr_es:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_plain_es.yaml
+  examples: data/examples/es_es_10.json
+  example_fields:
+    - translation
+    - text
+    - answer
+
+es_qa_en:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_qa_en.yaml
+  examples: data/examples/es_en_10.json
+  example_fields:
+    - question
+    - text
+    - answer
+
+es_qa_es:
+  input: data/input/es.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/es_qa_es.yaml
+  examples: data/examples/es_es_10.json
+  example_fields:
+    - question
+    - text
+    - answer
+
+#
+#  English Experiments
+#
+
+en_zshot_en:
+  input: data/input/en.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/en_zshot_en.yaml
+
+en_plain_en:
+  input: data/input/en.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/en_plain_en.yaml
+  examples: data/examples/en_en_10.json
+  example_fields:
+    - text
+    - answer
+
+en_tr_en:
+  input: data/input/en.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/en_plain_en.yaml
+  examples: data/examples/en_en_10.json
+  example_fields:
+    - translation
+    - text
+    - answer
+
+en_qa_en:
+  input: data/input/eu.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/en_qa_en.yaml
+  examples: data/examples/en_en_10.json
+  example_fields:
+    - question
+    - text
+    - answer
