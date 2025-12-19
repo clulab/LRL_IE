@@ -3,7 +3,7 @@
 ## layout
 - `configs/config.yaml`: model defaults, separated blocks for `llama`, `qwen`, and `aya`.
 - `configs/experiments.yaml`: per-experiment overrides (input/prompt/examples/out/raw_out/results_out).
-- `data/`: inputs, prompts (yaml), few-shot examples (jsonl).
+- `data/`: inputs, prompts (yaml), few-shot examples (json or jsonl).
 - `scripts/run_experiment.py`: run inference (supports llama, qwen, or aya).
 - `scripts/evaluate_llm_strict.py`: strict span-level evaluation (micro/macro, per-type).
 - `lrl_ie/`: shared helpers (io, config merge, prompting, json parsing, eval, qwen chatml).
@@ -20,11 +20,29 @@ download gguf models somewhere and update the model paths in `configs/config.yam
 pick an experiment from `configs/experiments.yaml` and a model block from `configs/config.yaml`.
 
 ### experiment types
-- `bn_qa_en`: bangla medical ner; qa-style wrapper in english (`Question/Text/Answer`); uses `data/prompts/bn_qa_en.yaml` + `data/examples/bn_en_10.jsonl`.
-- `bn_qa_bn`: same task/data, but qa-style wrapper in bangla; uses `data/prompts/bn_qa_bn.yaml` + `data/examples/bn_bn_10.jsonl`.
+- `bn_qa_en`: Bangla medical ner; qa-style wrapper in English (`Question/Text/Answer`); uses `data/prompts/bn_qa_en.yaml` + `data/examples/bn_en_10.jsonl`.
+- `bn_qa_bn`: same task/data, but qa-style wrapper in Bangla; uses `data/prompts/bn_qa_bn.yaml` + `data/examples/bn_bn_10.jsonl`.
 - `bn_plain_en`: same task/data, but instruction-style (no explicit question); uses `data/prompts/bn_plain_en.yaml` + `data/examples/bn_en_10.jsonl`.
-- `eu_qa_en`: basque clinical ner; qa-style wrapper in english (`Question/Text/Answer`); uses `data/prompts/eu_qa_en.yaml` + `data/examples/eu_en_10.jsonl`.
-- `eu_qa_eu`: same task/data, but qa-style wrapper in basque; uses `data/prompts/eu_qa_eu.yaml` + `data/examples/eu_eu_10.jsonl`.
+- `eu_zshot_en`: Basque clinical ner; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/eu_zshot_en.yaml`.
+- `eu_zshot_eu`: same task/data; plain-style wrapper in Basque (`Text/Answer`); uses `data/prompts/eu_zshot_eu.yaml`.
+- `eu_plain_en`: same task/data; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/eu_plain_en.yaml` + `data/examples/eu_en_10.jsonl`.
+- `eu_plain_eu`: same task/data; plain-style wrapper in Basque (`Text/Answer`); uses `data/prompts/eu_plain_eu.yaml` + `data/examples/eu_eu_10.jsonl`.
+- `eu_tr_en`: same task/data; plain-style wrapper in English (`Translation/Text/Answer`); uses `data/prompts/eu_plain_en.yaml` + `data/examples/eu_en_10.jsonl`.
+- `eu_tr_eu`: same task/data; plain-style wrapper in Basque (`Translation/Text/Answer`); uses `data/prompts/eu_plain_eu.yaml` + `data/examples/eu_eu_10.jsonl`.
+- `eu_qa_en`: same task/data; qa-style wrapper in English (`Question/Text/Answer`); uses `data/prompts/eu_qa_en.yaml` + `data/examples/eu_en_10.jsonl`.
+- `eu_qa_eu`: same task/data, but qa-style wrapper in Basque (`Question/Text/Answer`); uses `data/prompts/eu_qa_eu.yaml` + `data/examples/eu_eu_10.jsonl`.
+- `es_zshot_en`: Spanish clinical ner; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/es_zshot_en.yaml`.
+- `es_zshot_es`: same task/data; plain-style wrapper in Spanish (`Text/Answer`); uses `data/prompts/es_zshot_es.yaml`.
+- `es_plain_en`: same task/data; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/es_plain_en.yaml` + `data/examples/es_en_10.jsonl`.
+- `es_plain_es`: same task/data; plain-style wrapper in Spanish (`Text/Answer`); uses `data/prompts/es_plain_es.yaml` + `data/examples/es_es_10.jsonl`.
+- `es_tr_en`: same task/data; plain-style wrapper in English (`Translation/Text/Answer`); uses `data/prompts/es_plain_en.yaml` + `data/examples/es_en_10.jsonl`.
+- `es_tr_es`: same task/data; plain-style wrapper in Spanish (`Translation/Text/Answer`); uses `data/prompts/es_plain_es.yaml` + `data/examples/es_es_10.jsonl`.
+- `es_qa_en`: Spanish clinical ner; qa-style wrapper in English (`Question/Text/Answer`); uses `data/prompts/es_qa_en.yaml` + `data/examples/es_en_10.jsonl`.
+- `es_qa_es`: same task/data; but qa-style wrapper in Spanish (`Question/Text/Answer`); uses `data/prompts/es_qa_es.yaml` + `data/examples/es_es_10.jsonl`.
+- `en_zshot_en`: English clinical ner; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/en_zshot_en.yaml`.
+- `en_plain_en`: same task/data; plain-style wrapper in English (`Text/Answer`); uses `data/prompts/en_plain_en.yaml` + `data/examples/en_en_10.jsonl`.
+- `en_tr_en`: same task/data; plain-style wrapper in English (`Translation/Text/Answer`); uses `data/prompts/en_plain_en.yaml` + `data/examples/en_en_10.jsonl`.
+- `en_qa_en`: same task/data; but qa-style wrapper in English (`Question/Text/Answer`); uses `data/prompts/en_qa_en.yaml` + `data/examples/en_en_10.jsonl`.
 
 ### datasets and labels
 
@@ -37,14 +55,9 @@ pick an experiment from `configs/experiments.yaml` and a model block from `confi
 - `Medical_Procedure`: medical procedures/tests
 
 **Basque (eu) clinical ner dataset** (`data/input/eu.jsonl`):
-- `Sign_or_Symptom`: clinical signs and symptoms
-- `Disease_or_Syndrome`: diseases and syndromes
-- `Pathologic_Function`: pathological functions
-- `Finding`: clinical findings
-- `Other_Clinical_Disorder`: other clinical disorders
+- `Disorder`: pathologic process with a set of signs and symptoms
 - `Patient`: patient mentions
 - `H-Professional`: healthcare professionals
-- `Other_Role`: other roles (e.g., family members)
 
 ### model types
 - `llama`: uses `create_chat_completion` with `chat_format="llama-3"` (llama-3/3.1 instruct ggufs).
