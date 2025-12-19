@@ -1,0 +1,72 @@
+[
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"Her history revealed a diagnosis of left ovarian cyst 3cm in diameter 3 years previously.\"\n",
+        "answer": "Answer: \"{'Disorder': ['ovarian cyst'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"He had a medical history of diabetes mellitus, hypertension and he was amputated right leg (trans-femoral amputation) for diabetic arteriopathy six months before admission complicated by venous thrombosis.\"\n",
+        "answer": "Answer: \"{'Disorder': ['diabetes mellitus', 'hypertension', 'arteriopathy'], 'Patient': ['He', 'he'], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"At the first examination, we felt a firm lump inferior to the right brow.\"\n",
+        "answer": "Answer: \"{'Disorder': ['lump'], 'Patient': [], 'H-Professional': ['we']}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"On laparoscopic inspection, the cyst was found to be located in the ampullary and fimbrial regions of the left fallopian tube.\"\n",
+        "answer": "Answer: \"{'Disorder': ['cyst'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"She had few episodes in the previous two weeks of epistaxis, even 3-4 per day, usually stopping spontaneously.\"\n",
+        "answer": "Answer: \"{'Disorder': ['epistaxis'], 'Patient': ['She'], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"We report a case of a 63-year-old woman with a minute ampullary carcinoid tumor that was 7 mm in diameter, but was associated with 2 peripancreatic lymph node metastases.\"\n",
+        "answer": "Answer: \"{'Disorder': ['carcinoid tumor', 'lymph node metastases'], 'Patient': ['a 63-year-old woman'], 'H-Professional': ['We']}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"Computed tomography showed a 27-mm, hyper-enhancing tumor in the prepyloric antrum.\"\n",
+        "answer": "Answer: \"{'Disorder': ['tumor'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"Her serum cancer antigen (CA) 125 and CA 19-9 levels were within the normal ranges, and she was followed up at 6-month intervals at a private hospital.\"\n",
+        "answer": "Answer: \"{'Disorder': [], 'Patient': ['she'], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"Here we report a case of aggressive metastatic cholangiocarcinoma (MCC) in 72-year-old man, sequentially treated with two targeted chemotherapies.\"\n",
+        "answer": "Answer: \"{'Disorder': ['metastatic cholangiocarcinoma'], 'Patient': ['72-year-old man'], 'H-Professional': ['we']}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    },
+    {
+        "question": "Question: Which entities (Disorder, Patient, H-Professional) are present in this text?\n",
+        "text": "Text: \"The tumor was grade II of Scarf Bloom Richardson.\"\n",
+        "answer": "Answer: \"{'Disorder': ['tumor'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "English translation of the text: \n",
+        "description": "Description of text: \n"
+    }
+]

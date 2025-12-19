@@ -1,0 +1,72 @@
+[
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"-Eskuineko besapea:aurkikuntza patologikorik ez.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['aurkikuntza'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"-Right armpit: no pathological findings.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Larrialdi-zerbitzuan zeftriaxona antibioterapia enpirikoarekin hasi zeneta euste-tratamendua egin zen odola, plaketak eta fibrinogenoa transfundituz.\r\n24 orduko epean pazientearen egoera okertu eta heriotza konfirmatu zen.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': [], 'Patient': ['pazientearen'], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Within 24 hours, the patient's condition deteriorated and death was confirmed. Supportive treatment was performed with blood, platelets and fibrinogen transfusions.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Ohiko odol analisi batean PSAren igoera atzeman ostean, familia-medikuak urologoarengana bideratu zuen.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': [], 'Patient': [], 'H-Professional': ['familia-medikuak', 'urologoarengana']}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"After detecting an increase in PSA in a routine blood test, the family doctor referred him to a urologist.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Zelulitisa, psoriasia.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['Zelulitisa', 'psoriasia'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Cellulitis, psoriasis.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"GAUR EGUNEKO GAIXOTASUNA\r\nPazientea bertaratzeko arrazoiak: 2 asteko eboluzioko eztula eta espektorazio zornetsua; eta, duela 4 egunetatik, disnea basala areagotu eta ahalegin minimoengatik ere gertatzen zaio.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['eztula', 'disnea'], 'Patient': ['Pazientea'], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Reasons for the patient's presentation: 2-week history of cough and mucus-producing sputum; and, since 4 days ago, he has had increased basal dyspnea, even with minimal exertion.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Lehen aldiz eta inoren laguntzarik gabe psikiatraren kontsultara zorabioengatik datorren 40 urteko gizona da.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['zorabioengatik'], 'Patient': ['40 urteko gizona'], 'H-Professional': ['psikiatraren']}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"A 40-year-old man who comes to the psychiatrist's office for the first time and without anyone's help because of dizziness.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Eskuineko birikaren goiko lobuluko pneumonia 2008an.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['pneumonia'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Pneumonia in the upper lobe of the right lung in 2008.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Nekanek bikotearekin harreman toxikoa du, bere familiak ez ulertzen ez duena.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': [], 'Patient': ['Nekanek'], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Nekane has a toxic relationship with her partner, which her family does not understand.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Ebakuntza-barneko balorazioa\r\nAbdomen-barrunbea zabalduta, 2500 ml-ko debito hematikoa aurkitzen da; erretroperotoneoa askatzean, zirujauek ikusten dute aorta abdominala guztiz apurtuta, odoljario masiboa.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['aorta abdominala guztiz apurtuta', 'odoljario'], 'Patient': [], 'H-Professional': ['zirujauek']}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"When the abdominal cavity is opened, a blood loss of 2500 ml is found; Upon release of the retroperitoneum, surgeons observe a complete rupture of the abdominal aorta, massive bleeding.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    },
+    {
+        "question": "Galdera: Ze entitate (Disorder, Patient, H-Professional) agertzen dira testu honetan?\n",
+        "text": "Testua: \"Dislipemia.\"\n",
+        "answer": "Erantzuna: \"{'Disorder': ['Dislipemia'], 'Patient': [], 'H-Professional': []}\"\n",
+        "translation": "Testuaren ingelesezko itzulpena: \"Dyslipidemia.\"\n",
+        "description": "Testuaren deskribapena: \n"
+    }
+]
