@@ -6,6 +6,7 @@
 - `data/`: inputs, prompts (yaml), few-shot examples (json or jsonl).
 - `scripts/run_experiment.py`: run inference (supports llama, qwen, or aya).
 - `scripts/evaluate_llm_strict.py`: strict span-level evaluation (micro/macro, per-type).
+- `scripts/build_result_table.py`: build a per-experiment model table from metrics CSVs.
 - `lrl_ie/`: shared helpers (io, config merge, prompting, json parsing, eval, qwen chatml).
 
 ## setup
@@ -59,6 +60,16 @@ pick an experiment from `configs/experiments.yaml` and a model block from `confi
 - `Patient`: patient mentions
 - `H-Professional`: healthcare professionals
 
+**English (en) clinical ner dataset** (`data/input/en.jsonl`):
+- `Disorder`: pathologic process with a set of signs and symptoms
+- `Patient`: patient mentions
+- `H-Professional`: healthcare professionals
+
+**Spanish (es) clinical ner dataset** (`data/input/es.jsonl`):
+- `Disorder`: pathologic process with a set of signs and symptoms
+- `Patient`: patient mentions
+- `H-Professional`: healthcare professionals
+
 ### model types
 - `llama`: uses `create_chat_completion` with `chat_format="llama-3"` (llama-3/3.1 instruct ggufs).
 - `qwen`: uses `create_completion` with a manual ChatML prompt; supports `/no_think`, stop tokens, and (when the model emits a reasoning block) stripping everything up to `</think>` (see `configs/config.yaml`).
@@ -97,3 +108,9 @@ python scripts/evaluate_llm_strict.py --experiment bn_qa_en --model aya
 outputs per-type precision/recall/f1/support and macro/micro averages to console, and writes a csv under the experiment’s `results_out` directory.
 csv path defaults to `results/metrics_{experiment}_{model}.csv` (and the parent directory is created automatically).
 if you used `--debug_samples`, metrics reflect only that sampled subset (id intersection of gold/pred).
+
+## build per-experiment model table
+```bash
+python scripts/build_result_table.py --experiment en_zshot_en
+```
+writes `results/metrics_{experiment}_model_table.csv` with one row per model/score and columns for labels + macro/micro.
