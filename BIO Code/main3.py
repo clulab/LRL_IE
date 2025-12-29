@@ -1,24 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""
-Evaluate a fine-tuned Qwen3-0.6B GGUF on Bangla medical NER.
-
-- Writes JSON with fields:
-    {"true_labels": [...], "predicted_labels_flat": [...]}
-  so it plugs into your evaluate_entity_level.py unchanged.
-
-Usage (best quality, F16):
-  python main3.py --model_path models/qwen3-bner_20k.gguf \
-                  --data_path data/test_v1_fixed.json \
-                  --out_path data/qwen0p6_preds.json \
-                  --debug_first 3
-
-If you trained on a different text template, use:
-  --mode raw --prefix "Sentence: {sent}\n" --suffix "" --add_tags_token
-or customize prefix/suffix to match your SFT file.
-"""
-
 import os
 import json
 import argparse
@@ -48,21 +27,71 @@ BASE_TYPES = {
 # -----------------------------
 # Tiny few-shot prefix (fallback)
 # -----------------------------
-FEW_SHOT_PREFIX = """You are a Bangla Named Entity Recognition (NER) tagger for medical text.
-Output exactly one tag per token, space-separated. Use only these tags:
+FEW_SHOT_PREFIX = """You are a question-answering assistant that performs medical Named Entity Recognition (NER).
+For each input, identify ONLY the entities that are explicitly present in the provided text and output STRICTLY in BIO format.
+
+Output requirements:
+- Output exactly one tag per token, space-separated.
+- The number of output tags MUST exactly match the number of input tokens.
+- Use ONLY these tags:
 B-Age I-Age B-Dosage I-Dosage B-Health_Condition I-Health_Condition B-Medicine I-Medicine B-Medical_Procedure I-Medical_Procedure B-Specialist I-Specialist B-Symptom I-Symptom O
 
-Example:
-Sentence: আমার বয়স ৪৫ বছর ।
-Tags: O B-Age I-Age O
+Rules:
+- Copy spans verbatim from the text (Bangla/English as they appear). No paraphrasing or hallucination.
+- Duration vs Age: if a number modifies time words ("গত/পিছনের/ধরে" + দিন/সপ্তাহ/মাস, or "last/for/since" + days/weeks/months), DO NOT label it as Age.
+- Negation: if a symptom is negated within ~5 tokens ("না/নাই/নেই/করিনি/হয়নি/হয়ে নাই/হয় নি"), DO NOT tag it as Symptom.
+- Lab/test terms alone (e.g., Triglyceride, কোলেস্টেরল, HbA1c) are NOT symptoms unless the text explicitly states a complaint.
+- Prefer concise head+modifier spans; exclude extra function words/punctuation. Do not tag standalone single letters (e.g., X/RT/S).
+- Only label Age when it is an age expression (e.g., "৪০ বছর", "years old", "Age 27"), not bare numbers.
+- No commentary before or after the tags line.
+
+Label hints (recall boosters without adding false positives):
+- Symptom: Tag single-word symptoms (e.g., "জ্বর", "কাশি", "বমি") when a complaint verb appears nearby ("আছে/হচ্ছে/লাগছে/অনুভব/ভুগছি/সমস্যা").
+- Symptom: Also tag collocates exactly ("মাথা ব্যথা", "গলা ব্যথা", "ঘন কফ", "বুকে ব্যথা").
+- Health_Condition: Tag disease/diagnosis nouns ("ডায়াবেটিস", "উচ্চ রক্তচাপ", "অ্যাজমা", "থাইরয়েড", "মাইগ্রেন", "গ্যাস্ট্রাইটিস").
+- Specialist: Tag titles/specialities ("ডাক্তার", "চিকিৎসক", "বিশেষজ্ঞ", "ইএনটি বিশেষজ্ঞ", "গ্যাস্ট্রোএন্টারোলজিস্ট", "নিউরোলজিস্ট").
+- Medical_Procedure: Tag tests/imaging when performed/ordered ("করা হয়েছে/করাতে বলেছেন", "done/ordered").
+
+You will be asked:
+Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text?
+
+Examples (BIO):
 
 Example:
-Sentence: তিনি ৫০০ মিলিগ্রাম প্যারাসিটামল খেয়েছেন ।
-Tags: O B-Dosage I-Dosage B-Medicine O
+Sentence: আমার পিত্ত থলিতে পাথর আছে ।
+Tags: O O O O B-Health_Condition I-Health_Condition O
 
 Example:
-Sentence: চোখে সমস্যা দেখা দিলে চক্ষু বিশেষজ্ঞের পরামর্শ নিন ।
-Tags: B-Health_Condition I-Health_Condition O O B-Specialist I-Specialist O O
+Sentence: আমার বয়স 22 বছর .
+Tags: O O B-Age I-Age O
+
+Example:
+Sentence: তিনি ECG এবং ECHO করাতে বলেন ।
+Tags: O B-Medical_Procedure O B-Medical_Procedure O O
+
+Example:
+Sentence: তিনি PROPRANOLOL HCL 10 mg খেতে বলেন ।
+Tags: O B-Medicine I-Medicine I-Medicine I-Medicine O O
+
+Example:
+Sentence: আমার জ্বর নেই ।
+Tags: O B-Symptom O
+
+Example:
+Sentence: শ্বাস নিতে কষ্ট হচ্ছে ।
+Tags: B-Symptom I-Symptom I-Symptom O
+
+Example:
+Sentence: বুকে ব্যথা হচ্ছে ।
+Tags: B-Symptom I-Symptom O
+
+Example:
+Sentence: ডাক্তার এর পরামর্শ চাচ্ছি ।
+Tags: B-Specialist O O O
+
+Example:
+Sentence: চেস্ট এক্সরে রিপোর্ট নরমাল ।
+Tags: B-Medical_Procedure I-Medical_Procedure O O
 """.strip()
 
 # -----------------------------
@@ -204,10 +233,10 @@ def generate_tags(llm: Llama, tokens: List[str], prompt: str) -> List[str]:
 # CLI / Main
 # -----------------------------
 def parse_args():
-    ap = argparse.ArgumentParser(description="Evaluate fine-tuned Qwen3-0.6B GGUF on Bangla medical NER.")
+    ap = argparse.ArgumentParser(description="Evaluate Bangla medical NER.")
     ap.add_argument("--data_path", type=str, default="data/test_v1_fixed.json",
                     help="Test JSON with TOKEN (list[str]) and NER_TAG (list[str]).")
-    ap.add_argument("--model_path", type=str, default="models/qwen3-bner_20k.gguf",
+    ap.add_argument("--model_path", type=str, default="models/Qwen3-8B-Q4_K_M.gguf.gguf",
                     help="GGUF path. Use F16 for best accuracy; Q4_K_M is smaller/faster.")
     ap.add_argument("--out_path", type=str, default="data/qwen0p6_preds.json",
                     help="Where to save predictions JSON.")
