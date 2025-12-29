@@ -58,40 +58,40 @@ Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Pr
 Examples (BIO):
 
 Example:
-Sentence: আমার পিত্ত থলিতে পাথর আছে ।
-Tags: O O O O B-Health_Condition I-Health_Condition O
+Sentence: আমার পিত্ত থলিতে পাথর আছে । গত ২.৫ বছর যাবৎ এটা হয়েছে । যার আকার ৪ সেমি । এতদিন তীব্র কোন ব্যাথা ছিল না কিন্তু গত ৮ দিনের মধ্যে ৩ দিন পেটে তীব্র ব্যাথা হয়েছিল এবং পেটের ডানদিকে পাজরের নিচে চাপ দিলে ব্যাথা অনুভূত হয় । পিত্ত থলিতে পাথর হলে কী পেট ব্যাথার সাথে সাথে পেটের ডানদিকে পাজরের নিচে চাপ দিলে ব্যাথা অনুভূত হয় ? এবং কেন এই চাপ দিলে ব্যাথা অনুভূত হয় ? ? অভিজ্ঞ ডাক্তারের পরামর্শ চাচ্ছি ।
+Tags: O O O O B-Health_Condition I-Health_Condition O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-Symptom O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-Specialist O O O O
 
 Example:
-Sentence: আমার বয়স 22 বছর .
-Tags: O O B-Age I-Age O
+Sentence: আস্সালামুয়ালাইকুম , আমার বয়স 22 বছর . গত দেড় মাস যাবত আমার পালস অনেক বেশি থাকে ( বেশি সময় 100 এর উপরে ) বিশেষ করে খাবার খাওয়ার পর . সাথে দুর্বলতা থাকায় এক মাস আগে আমি একজন মেডিসিন বিশেষজ্ঞ কে দেখাই . তিনি ECG এবং ECHO করাতে বলেন কিন্তু রিপোর্টে তেমন অস্বাভাবিক কিছু না থাকায় তিনি আমাকে PROPRANOLOL HCL 10 mg ৩০ দিন এবং ALPRAZOLAM 0 . 25 mg ১০ দিন খেতে বলেন . এখন ঔষধ শেষ হওয়ার পর এ সমস্যা যায়নি . বরং ঔষধ খাওয়ার কিছুদিন পর থেকে আমার শ্বাস নিতে কষ্ট হচ্ছে . এর আগে কখনো শ্বাসকষ্ট হয়নি . আমার জ্বর নেই , এখন এই শ্বাস নিতে কষ্ট এবং অতিরিক্ত পালস এর কারনে স্বাভাবিক থাকতে পারছি না আর এমন সংকটময় পরিস্থিতি তে ডাক্তার এর কাছেও যেতে পারছি না . উল্লেখ্য : আমার ঠান্ডার সমস্যা থাকায় অনেক দিন আগে থেকেই Fexofenadine Hydrochloride 120 mg খাই ।
+Tags: O O O O B-Age I-Age O O O O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O O O O O O O O B-Specialist I-Specialist O O O O B-Medical_Procedure O B-Medical_Procedure O O O O O O O O O O O O B-Medicine I-Medicine I-Medicine I-Medicine I-Medicine O O O O B-Medicine I-Medicine O I-Medicine I-Medicine I-Medicine O I-Medicine O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O O O O B-Symptom O O O O O O O O B-Symptom O O O O B-Symptom I-Symptom I-Symptom O O B-Symptom I-Symptom O B-Symptom I-Symptom I-Symptom I-Symptom O O O O O O O O O O O B-Specialist O O O O O O O O O O O O O O O O O O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O O O O O B-Medicine I-Medicine I-Medicine I-Medicine O O
 
 Example:
-Sentence: তিনি ECG এবং ECHO করাতে বলেন ।
-Tags: O B-Medical_Procedure O B-Medical_Procedure O O
+Sentence: আমার বাবা , মা ভাই , বোন কারো এ্যাজমা নেই । আমার এলাজি আছে , বুক ভারি হয় , শ্বাস নিতে সমস্যা হয় । ইকো , ইসিজি , চেস্ট এক্সরে রিপোর্ট নরমাল । আমি এই সমস্যার জন্য কোন ডাক্তার দেখাবো ? ডাক্তারভাই এ কি এই বিষয়ে অভিজ্ঞ ডাক্তার আছেন ?
+Tags: O O O O O O O B-Health_Condition O O O B-Health_Condition O O B-Symptom I-Symptom I-Symptom O B-Symptom I-Symptom I-Symptom I-Symptom O B-Medical_Procedure O B-Medical_Procedure O B-Medical_Procedure I-Medical_Procedure O O O O O O O O O O O O B-Specialist O O O O O O O O O O O B-Specialist O O O O O O O O
 
 Example:
-Sentence: তিনি PROPRANOLOL HCL 10 mg খেতে বলেন ।
-Tags: O B-Medicine I-Medicine I-Medicine I-Medicine O O
+Sentence: she had pain in her left back shoulder then had rolac 10 days then visited a government hospital a doctor prescribed these : Flexi 100mg , Flexllax 10mg , Cosec 20mg , Neurolin 25 . Still no change . What specialist doctor should she visit ?
+Tags: O O B-Symptom I-Symptom I-Symptom I-Symptom I-Symptom I-Symptom O O O B-Medicine O O O O O O O O O O O O O O B-Medicine I-Medicine O B-Medicine I-Medicine O B-Medicine I-Medicine O B-Medicine I-Medicine O O O O O O O O O O O
 
 Example:
-Sentence: আমার জ্বর নেই ।
-Tags: O B-Symptom O
+Sentence: আসসালামু আলাইকুম স্যার , স্যার আমার আম্মুর অস্থিরতা ও শাসকষ্ট , এতে আবার পায়েও পানি আসে । এতে কি হৃদ রোগ হইছে ? আর কি করবো বুঝতে পারছি না ।
+Tags: O O O O O O B-Symptom O B-Symptom O O O B-Symptom I-Symptom I-Symptom O O O B-Health_Condition I-Health_Condition O O O O O O O O O O O O O
 
 Example:
-Sentence: শ্বাস নিতে কষ্ট হচ্ছে ।
-Tags: B-Symptom I-Symptom I-Symptom O
+Sentence: এলার্জির সমস্যার কারণে রোদে গেলে গা চিটমিট করে , মাথার ভিতরে কিলবিল করে । সকালে ঘুম থেকে উঠলে অনবরত হাঁচি হয় । কখনো নিয়মিত কোনো এলার্জির ওষুধ খাইনি । এক্ষেত্রে আমি কি করতে পারি ? এনার্জির কারণে অনেক দৈনন্দিন কাজ করতে পারি না ।
+Tags: B-Health_Condition O O O O B-Symptom I-Symptom I-Symptom I-Symptom O B-Symptom I-Symptom I-Symptom I-Symptom O O O O O O B-Symptom I-Symptom I-Symptom O O O O O O O B-Medicine I-Medicine I-Medicine O O O O O O O O O O B-Health_Condition O O O O O O O O O
 
 Example:
-Sentence: বুকে ব্যথা হচ্ছে ।
-Tags: B-Symptom I-Symptom O
+Sentence: গত সোমবার হৈতে আমার হাড়ের জয়েন্টে ব্যথা , গা ম্যাচ ম্যাচ করে । ভিতরে ভিতরে জ্বর লাগে কিন্তু মাপলে ৯৯ । নাপা এক্সটা খাইতেছি । উল্লেখ্য ৩ / ৪ আগে ডিক্স পোলাপ্স ছিল । শূকনো কাশি নাই , তবে টুটি গিলতে হালকা ব্যাথা লাগে । করোনা ভয়ে ivermactin 12mg 2pc ও ডক সিন100 - ৫টি খাইছি । জ্বর সব সময় থাকে না , শরির খুব দুর্লভ ।
+Tags: O O O B-Symptom I-Symptom I-Symptom O B-Symptom I-Symptom I-Symptom O B-Symptom I-Symptom I-Symptom O O O O O O O O B-Medicine I-Medicine O O O O O O O O B-Health_Condition I-Health_Condition O O O O O O O O O O O O O O O B-Symptom I-Symptom I-Symptom I-Symptom I-Symptom O O O O B-Medicine I-Medicine I-Medicine O O B-Medicine I-Medicine O I-Medicine O O O O O O O O O O O O O B-Symptom O O O O O O O B-Symptom I-Symptom I-Symptom O
 
 Example:
-Sentence: ডাক্তার এর পরামর্শ চাচ্ছি ।
-Tags: B-Specialist O O O
+Sentence: গত সপ্তাহ থেকে জ্বর আছে , রাতে কাশি বাড়ে , মাঝে মাঝে বমি হয় .
+Tags: O O O B-Symptom O O O B-Symptom O O O B-Symptom O
 
 Example:
-Sentence: চেস্ট এক্সরে রিপোর্ট নরমাল ।
-Tags: B-Medical_Procedure I-Medical_Procedure O O
+Sentence: বুকে ব্যথা হচ্ছে এবং শ্বাসকষ্ট আছে ; খুব অস্বস্তি লাগছে .
+Tags: B-Symptom I-Symptom O O B-Symptom O O B-Symptom O
 """.strip()
 
 # -----------------------------
