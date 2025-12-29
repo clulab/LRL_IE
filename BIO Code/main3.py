@@ -27,7 +27,7 @@ BASE_TYPES = {
 # -----------------------------
 # Tiny few-shot prefix (fallback)
 # -----------------------------
-FEW_SHOT_PREFIX = """You are a question-answering assistant that performs medical Named Entity Recognition (NER).
+FEW_SHOT_PREFIX = """You are a Entity recognizer that performs medical Named Entity Recognition (NER).
 For each input, identify ONLY the entities that are explicitly present in the provided text and output STRICTLY in BIO format.
 
 Output requirements:
