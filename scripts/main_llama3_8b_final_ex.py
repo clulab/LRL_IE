@@ -1026,7 +1026,7 @@ FEWSHOT_01: List[str] = [
 
 QA_FEWSHOTS_ALL: List[str] = [
     (
-        "Description of text: The patient says they have stones in the gallbladder for about 2.5 years, the stone is 4 cm, and recently they had several episodes of severe abdominal pain with tenderness under the right ribs. They are asking if this pain pattern is typical for gallbladder stones and want an experienced doctor’s advice. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The Bangla text says the patient has gallbladder stones for about 2.5 years and the stone size is 4 cm. The phrase “পিত্ত থলিতে পাথর” is a Health_Condition entity (a diagnosis/condition). Because of this condition, the patient reports pain-related symptoms, such as severe abdominal pain and pain when pressing under the right ribs (these are Symptom entities). No age, medicine, specialist, or procedure is mentioned. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আমার পিত্ত থলিতে পাথর আছে। গত ২.৫ বছর যাবৎ এটা হয়েছে। যার আকার ৪ সেমি। এতদিন তীব্র কোন ব্যাথা ছিল না কিন্তু গত ৮ দিনের মধ্যে ৩ দিন পেটে তীব্র ব্যাথা হয়েছিল এবং পেটের ডানদিকে পাজরের নিচে চাপ দিলে ব্যাথা অনুভূত হয়। পিত্ত থলিতে পাথর হলে কী পেট ব্যাথার সাথে সাথে পেটের ডানদিকে পাজরের নিচে চাপ দিলে ব্যাথা অনুভূত হয়? এবং কেন এই চাপ দিলে ব্যাথা অনুভূত হয়?? অভিজ্ঞ ডাক্তারের পরামর্শ চাচ্ছি।\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"ব্যাথা\",\"পেটে তীব্র ব্যাথা\",\"চাপ দিলে ব্যাথা\",\"পেট ব্যাথার\"], "
@@ -1036,7 +1036,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: A 22-year-old patient reports persistently high pulse, especially after meals, plus weakness. A medicine specialist advised ECG and ECHO, which were mostly normal, and prescribed several medicines, but the problem and new shortness of breath continue. The patient also has a history of cold problems and takes Fexofenadine regularly. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The Bangla text explicitly gives the patient’s age (22 বছর), so that is an Age entity. The patient describes symptoms like high pulse, weakness, and difficulty breathing, which are Symptom entities. A medicine specialist (মেডিসিন বিশেষজ্ঞ) is mentioned, so that is a Specialist entity. Diagnostic tests ECG and ECHO are mentioned, so they are Medical_Procedure entities. Several drug names and dosages are written (e.g., PROPRANOLOL, ALPRAZOLAM, Fexofenadine), which are Medicine entities. No clear disease diagnosis is given as a named condition (so Health_Condition may be empty). Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আস্সালামুয়ালাইকুম, আমার বয়স 22 বছর. গত দেড় মাস যাবত আমার পালস অনেক বেশি থাকে ( বেশি সময় 100 এর উপরে ) বিশেষ করে খাবার খাওয়ার পর. সাথে দুর্বলতা থাকায় এক মাস আগে আমি একজন মেডিসিন বিশেষজ্ঞ কে দেখাই. তিনি ECG এবং ECHO করাতে বলেন কিন্তু রিপোর্টে তেমন অস্বাভাবিক কিছু না থাকায় তিনি আমাকে PROPRANOLOL HCL 10 mg ৩০ দিন এবং ALPRAZOLAM 0. 25 mg ১০ দিন খেতে বলেন. এখন ঔষধ শেষ হওয়ার পর এ সমস্যা যায়নি. বরং ঔষধ খাওয়ার কিছুদিন পর থেকে আমার শ্বাস নিতে কষ্ট হচ্ছে. এর আগে কখনো শ্বাসকষ্ট হয়নি. আমার জ্বর নেই, এখন এই শ্বাস নিতে কষ্ট এবং অতিরিক্ত পালস এর কারনে স্বাভাবিক থাকতে পারছি না আর এমন সংকটময় পরিস্থিতি তে ডাক্তার এর কাছেও যেতে পারছি না. উল্লেখ্য: আমার ঠান্ডার সমস্যা থাকায় অনেক দিন আগে থেকেই Fexofenadine Hydrochloride 120 mg খাই.\"\n"
         "Answer: {\"Age\":[\"22 বছর\"], "
         "\"Symptom\":[\"পালস অনেক বেশি\",\"দুর্বলতা\",\"শ্বাস নিতে কষ্ট\",\"শ্বাসকষ্ট\",\"জ্বর\",\"অতিরিক্ত পালস\",\"ঠান্ডার সমস্যা\"], "
@@ -1046,7 +1046,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[\"ECG\",\"ECHO\"]}\n\n"
     ),
     (
-        "Description of text: The writer explains that none of their close family members have asthma, but they themselves have allergy problems, feel chest heaviness, and have trouble breathing. Echo, ECG, and chest X-ray reports are normal. They are asking which doctor to see and if there is an experienced doctor for this issue. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The Bangla text says the writer has allergy and mentions asthma. These are Health_Condition entities because they are named medical conditions (“এলাজি”, “এ্যাজমা”). The writer also reports symptoms such as chest heaviness and breathing difficulty, which are Symptom entities. Tests like echo, ECG, and chest X-ray are mentioned; these are Medical_Procedure entities. They ask which doctor to see, but no specific specialist type is named (so Specialist may be empty). No medicines or age are stated. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আমার বাবা, মা ভাই, বোন কারো এ্যাজমা নেই। আমার এলাজি আছে, বুক ভারি হয়, শ্বাস নিতে সমস্যা হয়। ইকো, ইসিজি, চেস্ট এক্সরে রিপোর্ট নরমাল। আমি এই সমস্যার জন্য কোন ডাক্তার দেখাবো? ডাক্তারভাই এ কি এই বিষয়ে অভিজ্ঞ ডাক্তার আছেন?\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"বুক ভারি হয়\",\"শ্বাস নিতে সমস্যা\"], "
@@ -1057,7 +1057,7 @@ QA_FEWSHOTS_ALL: List[str] = [
 
     ),
     (
-        "Description of text: The patient (or caregiver) says she has pain in her left back and shoulder, took Rolac for 10 days, then went to a government hospital where several medicines were prescribed. There is still no improvement, and they are asking which specialist doctor she should visit. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The text reports a symptom: pain in the left back/shoulder area (Symptom). It also lists several drug names (Rolac, Flexi, Flexllax, Cosec, Neurolin), which are Medicine entities. They ask which specialist doctor to visit, but no specific specialist type is written (so Specialist may be empty). No age, diagnosis/condition, or procedure is stated. Now read the text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"she had pain in her left back shoulder then had rolac 10 days then visited a government hospital a doctor prescribed these: Flexi 100mg, Flexllax 10mg, Cosec 20mg, Neurolin 25. Still no change. What specialist doctor should she visit?\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"pain in her left back\"], "
@@ -1067,7 +1067,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The writer describes their mother’s restlessness, shortness of breath, and swelling in the legs. They are worried that this may be heart disease and are unsure what to do next. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The Bangla text describes symptoms in the mother, including restlessness, shortness of breath, and swelling/water in the legs. These are Symptom entities. The text also mentions “হৃদ রোগ” (heart disease) as a suspected condition, which is a Health_Condition entity. No age, medicines, specialist type, or procedure is given. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আসসালামু আলাইকুম স্যার, স্যার আমার আম্মুর অস্থিরতা ও শাসকষ্ট, এতে আবার পায়েও পানি আসে। এতে কি হৃদ রোগ হইছে? আর কি করবো বুঝতে পারছি না।\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"অস্থিরতা\",\"শাসকষ্ট\",\"পায়েও পানি আসে\"], "
@@ -1077,7 +1077,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The patient has allergy problems; going in the sun causes skin discomfort, there is a crawling sensation in the head, and they sneeze continuously in the morning. They have not taken allergy medicine regularly and are asking what they can do because the allergy interferes with daily activities. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in text.\n"
+        "Description of text: The Bangla text clearly describes an allergy problem, which is a Health_Condition entity (“এলার্জির”). It also describes allergy-related symptoms, such as skin discomfort in the sun, crawling sensation in the head, and continuous sneezing (Symptom). It mentions “এলার্জির ওষুধ” only in a generic way, but it still refers to medicine use (Medicine). No age, specialist, or procedure is stated. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"এলার্জির সমস্যার কারণে রোদে গেলে গা চিটমিট করে, মাথার ভিতরে কিলবিল করে। সকালে ঘুম থেকে উঠলে অনবরত হাঁচি হয়। কখনো নিয়মিত কোনো এলার্জির ওষুধ খাইনি। এক্ষেত্রে আমি কি করতে পারি? এনার্জির কারণে অনেক দৈনন্দিন কাজ করতে পারি না।\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"রোদে গেলে গা চিটমিট করে\",\"মাথার ভিতরে কিলবিল করে\",\"হাঁচি\"], "
@@ -1087,7 +1087,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: Since last Monday, the patient has pain in the joints, body aches, and a feeling of internal fever around 99°F. They are taking Napa Extra and mention a history of disc prolapse 3–4 years ago. There is no dry cough, but there is mild throat pain when swallowing, and they took ivermectin and another medicine out of fear of COVID. The fever is not constant, and the body feels very weak. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in this text.\n"
+        "Description of text: The Bangla text reports multiple symptoms: joint pain, body aches, internal fever feeling, mild throat pain when swallowing, and weakness (Symptom). It lists several medicines (নাপা এক্সটা, ivermactin 12mg, ডক সিন100), which are Medicine entities. It also mentions a past diagnosis “ডিক্স পোলাপ্স”, which is a Health_Condition entity. No age, specialist, or medical procedure is present. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"গত সোমবার হৈতে আমার হাড়ের জয়েন্টে ব্যথা, গা ম্যাচ ম্যাচ করে। ভিতরে ভিতরে জ্বর লাগে কিন্তু মাপলে ৯৯। নাপা এক্সটা খাইতেছি। উল্লেখ্য ৩/৪ আগে ডিক্স পোলাপ্স ছিল। শূকনো কাশি নাই, তবে টুটি গিলতে হালকা ব্যাথা লাগে। করোনা ভয়ে ivermactin 12mg 2pc ও ডক সিন100 - ৫টি খাইছি। জ্বর সব সময় থাকে না, শরির খুব দুর্লভ।\"\n"
         "Answer: {\"Age\":[], "
         "\"Symptom\":[\"হাড়ের জয়েন্টে ব্যথা\",\"গা ম্যাচ ম্যাচ করে\",\"ভিতরে ভিতরে জ্বর লাগে\",\"টুটি গিলতে হালকা ব্যাথা লাগে\",\"জ্বর\",\"শরির খুব দুর্লভ\"], "
@@ -1097,20 +1097,19 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The patient reports that they have had fever for the last week, their cough gets worse at night, and they occasionally vomit. Your task is to identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
+        "Description of text: The Bangla text reports three symptoms: fever, cough (worse at night), and occasional vomiting. These are Symptom entities. No age, medicine, condition, specialist, or procedure is mentioned. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"গত সপ্তাহ থেকে জ্বর আছে, রাতে কাশি বাড়ে, মাঝে মাঝে বমি হয়.\"\n"
         "Answer: {\"Age\":[], \"Symptom\":[\"জ্বর\",\"কাশি\",\"বমি\"], \"Medicine\":[], "
         "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The patient reports having chest pain, shortness of breath, and a strong feeling of discomfort. These symptoms suggest an urgent physical issue. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
-        "are present in this text?\n"
+        "Description of text: The Bangla text reports urgent symptoms: chest pain, shortness of breath, and strong discomfort (Symptom). There is no explicit diagnosis/condition, no medicine name, no specialist type, no procedure, and no age. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"বুকে ব্যথা হচ্ছে এবং শ্বাসকষ্ট আছে; খুব অস্বস্তি লাগছে.\"\n"
         "Answer: {\"Age\":[], \"Symptom\":[\"বুকে ব্যথা\",\"শ্বাসকষ্ট\",\"অস্বস্তি\"], \"Medicine\":[], "
         "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The text states that the patient has asthma and gastritis as existing conditions, and was newly diagnosed with migraine yesterday. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
+        "Description of text: The Bangla text lists existing medical diagnoses: asthma, gastritis, and migraine. These are Health_Condition entities because they are named conditions. No symptoms, age, medicines, specialist, or procedure are mentioned directly. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"রোগী অ্যাজমা ও গ্যাস্ট্রাইটিসের রোগী; গতকাল ধরা পড়েছে মাইগ্রেন.\"\n"
         "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
         "\"Health_Condition\":[\"অ্যাজমা\",\"গ্যাস্ট্রাইটিস\",\"মাইগ্রেন\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
@@ -1134,33 +1133,31 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Question: Which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) "
-        "are present in this text?\n"
+        "Description of text: The Bangla text mentions symptoms: cough and fever (Symptom). It also says a medicine specialist (মেডিসিন বিশেষজ্ঞ) prescribed Cefixime (সেফিক্সিম), which is a Medicine entity. No age is given. It says X-ray was not done (“এক্স-রে করা হয়নি”), so the procedure is mentioned but negated; based on your Answer template, Medical_Procedure is left empty. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"গত তিন দিন ধরে কাশি ও জ্বর আছে। একজন মেডিসিন বিশেষজ্ঞ আমাকে সেফিক্সিম দিয়েছেন। এক্স-রে করা হয়নি.\"\n"
         "Answer: {\"Age\":[], \"Symptom\":[\"কাশি\",\"জ্বর\"], \"Medicine\":[\"সেফিক্সিম\"], "
         "\"Health_Condition\":[], \"Specialist\":[\"মেডিসিন বিশেষজ্ঞ\"], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The text describes a 55-year-old patient who has diabetes and high blood pressure, and is currently taking Metformin and Losartan. It states the patient’s age, chronic health conditions, and the medicines being used. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
-        "are present in this text?\n"
+        "Description of text: The Bangla text explicitly gives age (৫৫ বছর), so Age is present. It also states two chronic diagnoses: diabetes and high blood pressure, which are Health_Condition entities. It lists two drugs (Metformin, Losartan), which are Medicine entities. No symptoms, specialist, or procedure are mentioned. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"রোগীর বয়স ৫৫ বছর। তিনি ডায়াবেটিস ও উচ্চ রক্তচাপের রোগী এবং মেটফরমিন ও লোসারটান খাচ্ছেন.\"\n"
         "Answer: {\"Age\":[\"৫৫ বছর\"], \"Symptom\":[], \"Medicine\":[\"মেটফরমিন\",\"লোসারটান\"], "
         "\"Health_Condition\":[\"ডায়াবেটিস\",\"উচ্চ রক্তচাপ\"], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The text states that an ENT specialist advised the patient to undergo a tympanometry test. From this information, you have to identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
+        "Description of text: The Bangla text mentions a specific specialist type “ইএনটি বিশেষজ্ঞ”, which is a Specialist entity. It also mentions a test “টিম্পানোমেট্রি”, which is a Medical_Procedure entity. No age, symptom, medicine, or diagnosis is present. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"ইএনটি বিশেষজ্ঞ টিম্পানোমেট্রি করতে বলেছেন.\"\n"
         "Answer: {\"Age\":[], \"Symptom\":[], \"Medicine\":[], "
         "\"Health_Condition\":[], \"Specialist\":[\"ইএনটি বিশেষজ্ঞ\"], \"Medical_Procedure\":[\"টিম্পানোমেট্রি\"]}\n\n"
     ),
     (
-        "Description of text: The parent describes that their baby is 50 days old and for the last two to three days has symptoms such as dry cold, blocked nose, and difficulty breathing. They are using Nazomist BP 0.9% nasal drops, but the nose is still not opening. They want to know if more medicine is needed and what medicines can be given. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
+        "Description of text: The Bangla text gives the baby’s age (৫০ দিন), so Age is present. It describes symptoms: dry cold feeling, blocked nose, difficulty breathing, and nose not opening (Symptom). It mentions using a named nasal drop “নজোমিষ্ট বিপি০. ৯ %”, which is a Medicine entity. No diagnosis/condition, specialist, or procedure is stated. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আমার বাচ্চার ৫০ দিন। দুই তিন দিন যাবত শুকনা ঠান্ডা মনে হচ্ছে। নাক বন্ধ হয়ে থাকে, শ্বাস নিতে কষ্ট হয়। আমি নজোমিষ্ট বিপি০. ৯ % ব্যবহার করছি কিন্তু নাক খোলছে না। এখন আর কি কোন ঔষধ খাওয়াতে হবে আর কি ঔষধ খাওয়াতে পারি??\"\n"
         "Answer: {\"Age\":[\"৫০ দিন\"], \"Symptom\":[\"শুকনা ঠান্ডা\",\"নাক বন্ধ\",\"শ্বাস নিতে কষ্ট\",\"নাক খোলছে না\"], "
         "\"Medicine\":[\"নজোমিষ্ট বিপি০\"], \"Health_Condition\":[], \"Specialist\":[], \"Medical_Procedure\":[]}\n\n"
     ),
     (
-        "Description of text: The parent explains that their 10-year-old child recently had pox, which has now resolved. However, white and dark marks remain on the skin. They are asking whether these spots will fade naturally or if any medicine is needed. You have to find out which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
+        "Description of text: The Bangla text gives the child’s age (১০ বছর), so Age is present. It mentions the child had pox (“পক্স”), which is a Health_Condition entity. Now the remaining problem is skin marks: white spots and dark spots, which are Symptom entities. No medicine, specialist, or procedure is explicitly named. Now read the Bangla text and check the Answer, then identify which entities (Age, Symptom, Medicine, Health_Condition, Specialist, Medical_Procedure) are present in the text.\n"
         "Text: \"আমার ছেলের বয়স ১০ বছর। ওর গায়ে পক্স উঠেছিল। এখন ভাল হয়ে গেছে। কিন্তু শরীরে সাদা সাদা দাগ আবার কিছু কাল কাল দাগ দেখা যাচ্ছে। এগুলো কি এমনিতেই চলে যাবে নাকি কোন ওষুধ ব্যবহার করতে হবে?\"\n"
         "Answer: {\"Age\":[\"১০ বছর\"], "
         "\"Symptom\":[\"শরীরে সাদা সাদা দাগ\",\"কাল কাল দাগ\"], "
@@ -1170,6 +1167,7 @@ QA_FEWSHOTS_ALL: List[str] = [
         "\"Medical_Procedure\":[]}\n\n"
     ),  
 ]
+
 
 # Base QA-style user template (English)
 USER_TEMPLATE_QA_EN = (
