@@ -273,6 +273,18 @@ en_plain_en:
     - text
     - answer
 
+en_descr_en:
+  input: data/input/en.jsonl
+  out: data/out/preds_{experiment}_{model}.jsonl
+  raw_out: data/out/raw_{experiment}_{model}.jsonl
+  results_out: results/metrics_{experiment}_{model}.csv
+  prompt: data/prompts/en_plain_en.yaml
+  examples: data/examples/en_en_10.json
+  example_fields:
+    - description
+    - text
+    - answer
+
 en_tr_en:
   input: data/input/en.jsonl
   out: data/out/preds_{experiment}_{model}.jsonl
